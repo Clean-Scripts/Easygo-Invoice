@@ -5,16 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyGo | Official Invoice</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
     <style>
+        /* Base font reset to standard non-italic Playfair */
         body { font-family: 'Playfair Display', serif; -webkit-print-color-adjust: exact; }
         .heading-font { font-family: 'Cinzel', serif; }
         
-        /* A4 Constraints */
+        /* A4 Constraints: Strict sizing to prevent bleeding */
         .print-container {
             width: 210mm;
             height: 297mm;
-            padding: 8mm;
+            padding: 5mm; /* Reduced padding to fit border properly */
             margin: auto;
             background: white;
             box-sizing: border-box;
@@ -25,10 +26,21 @@
         .outer-border {
             border: 1px solid #000;
             flex-grow: 1;
-            padding: 25px;
+            padding: 20px;
             display: flex;
             flex-direction: column;
             position: relative;
+        }
+
+        /* INVOICE Title: Normal weight, centered, specific spacing */
+        .invoice-title {
+            font-family: 'Cinzel', serif;
+            font-size: 3.5rem;
+            text-align: center;
+            margin-top: 1.5rem;
+            margin-bottom: 2rem;
+            letter-spacing: 0.15em;
+            font-style: normal !important;
         }
 
         @media print {
@@ -40,8 +52,6 @@
 
         .custom-scroll::-webkit-scrollbar { width: 6px; }
         .custom-scroll::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
-        
-        /* Dropdown Styling */
         datalist { display: none; }
     </style>
 </head>
@@ -84,62 +94,61 @@
             <div class="print-container shadow-2xl">
                 <div class="outer-border">
                     
-                    <div class="flex items-start justify-between">
+                    <div class="flex items-center justify-between mb-4">
                         <div class="w-1/4">
-                            <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" alt="EasyGo Logo" class="w-32">
+                            <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" alt="EasyGo Logo" class="w-28">
                         </div>
                         
-                        <div class="w-1/2 text-center text-[11px] space-y-1 font-bold pt-2">
+                        <div class="w-1/2 text-center text-[10px] space-y-0.5 leading-tight">
                             <p>📍 : 114, Prime Square, Omaxe City 1 - Indore M.P.</p>
                             <p>📞 : +91 7651837322, +91 92389 61346</p>
                             <p>✉️ : Shibukochle@gmail.com | <b>Website:</b></p>
-                            <p class="text-blue-900 text-[14px] mt-2 font-bold">GST: 23HAVPB1805E1ZZ</p>
+                            <p class="text-blue-900 text-[12px] font-bold mt-1">GST: 23HAVPB1805E1ZZ</p>
                         </div>
 
-                        <div class="w-1/4 flex flex-col items-end">
-                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/easygo.com.png?raw=true" class="w-20 h-20 border" alt="Website QR">
+                        <div class="w-1/4 flex justify-end">
+                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/easygo.com.png?raw=true" class="w-16 h-16 border" alt="Website QR">
                         </div>
                     </div>
 
-                    <h1 class="heading-font text-6xl text-center mt-12 mb-10 tracking-[0.4em] font-medium italic">INVOICE</h1>
+                    <h1 class="invoice-title">INVOICE</h1>
 
-                    <div class="flex justify-between mb-8 px-2">
+                    <div class="flex justify-between mb-6 px-1">
                         <div class="space-y-1">
-                            <p class="heading-font font-bold text-sm uppercase underline decoration-1 underline-offset-4">Date Issued:</p>
-                            <p id="viewDate" class="font-bold text-gray-800 text-sm">01 January 2030</p>
-                            <p class="heading-font font-bold text-sm mt-6 uppercase underline decoration-1 underline-offset-4">Invoice No:</p>
-                            <p id="viewNo" class="font-bold text-gray-800 text-sm">01234</p>
+                            <p class="heading-font font-bold text-xs uppercase">Date Issued:</p>
+                            <p id="viewDate" class="text-gray-800 text-sm">01 January 2030</p>
+                            <p class="heading-font font-bold text-xs mt-4 uppercase">Invoice No:</p>
+                            <p id="viewNo" class="text-gray-800 text-sm">01234</p>
                         </div>
                         <div class="text-right space-y-1">
-                            <p class="heading-font font-bold text-sm uppercase underline decoration-1 underline-offset-4">Issued To:</p>
-                            <p id="viewTo" class="font-bold text-lg">Sacha Dubois</p>
-                            <p class="text-gray-800 font-bold text-sm">123 Anywhere St., Any City, ST</p>
-                            <p class="text-gray-800 font-bold text-sm">12345</p>
+                            <p class="heading-font font-bold text-xs uppercase">Issued To:</p>
+                            <p id="viewTo" class="font-bold text-base">Sacha Dubois</p>
+                            <p class="text-gray-800 text-xs leading-relaxed">123 Anywhere St., Any City, ST<br>12345</p>
                         </div>
                     </div>
 
-                    <table class="w-full border-collapse border border-black text-left mb-4">
-                        <thead class="bg-gray-100 heading-font text-[13px] font-bold">
+                    <table class="w-full border-collapse border border-black text-left">
+                        <thead class="bg-gray-100 heading-font text-[12px] font-bold">
                             <tr>
-                                <th class="border border-black px-4 py-3 w-16 text-center">NO</th>
-                                <th class="border border-black px-4 py-3">DESCRIPTION</th>
-                                <th class="border border-black px-4 py-3 w-20 text-center">QTY</th>
-                                <th class="border border-black px-4 py-3 w-24 text-center">RATE</th>
-                                <th class="border border-black px-4 py-3 w-32 text-center">SUBTOTAL</th>
+                                <th class="border border-black px-4 py-2 w-12 text-center">NO</th>
+                                <th class="border border-black px-4 py-2">DESCRIPTION</th>
+                                <th class="border border-black px-4 py-2 w-16 text-center">QTY</th>
+                                <th class="border border-black px-4 py-2 w-20 text-center">RATE</th>
+                                <th class="border border-black px-4 py-2 w-28 text-center">SUBTOTAL</th>
                             </tr>
                         </thead>
                         <tbody id="viewItems"></tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="4" class="border border-black px-4 py-3 text-right heading-font font-bold text-sm">GRAND TOTAL</td>
-                                <td id="viewTotal" class="border border-black px-4 py-3 text-center font-bold font-sans text-xl italic">₹ 0</td>
+                                <td colspan="4" class="border border-black px-4 py-2 text-right heading-font font-bold text-xs">GRAND TOTAL</td>
+                                <td id="viewTotal" class="border border-black px-4 py-2 text-center font-bold font-sans text-lg italic">₹ 0</td>
                             </tr>
                         </tfoot>
                     </table>
 
-                    <div class="mt-auto pt-10 flex justify-between items-end px-2">
-                        <div class="text-[12px] space-y-1 font-bold leading-relaxed">
-                            <p class="heading-font font-bold mb-2 text-[13px] uppercase underline">Payment Details:</p>
+                    <div class="mt-auto flex justify-between items-end px-1 pb-2">
+                        <div class="text-[11px] space-y-0.5 font-bold">
+                            <p class="heading-font font-bold mb-1 text-xs uppercase">Payment Details:</p>
                             <p>Bank Name: Shibu Kochle</p>
                             <p>Account No: 42708580348</p>
                             <p>Account Type: Savings</p>
@@ -147,18 +156,17 @@
                         </div>
                         
                         <div class="text-center">
-                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/QrCode.jpeg?raw=true" class="w-24 h-24 border mb-1 mx-auto" alt="Payment QR">
-                            <p class="text-[10px] font-bold heading-font uppercase">Scan to Pay</p>
+                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/QrCode.jpeg?raw=true" class="w-20 h-20 border mb-1 mx-auto" alt="Payment QR">
                         </div>
 
                         <div class="text-center">
-                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/invoice-sign.png?raw=true" alt="Sign" class="w-32 mx-auto -mb-2">
-                            <div class="border-t-2 border-black w-44 mx-auto"></div>
-                            <p class="heading-font text-[10px] mt-1 font-bold uppercase tracking-tighter">Sender's Seal & Sign</p>
+                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/invoice-sign.png?raw=true" alt="Sign" class="w-28 mx-auto -mb-1">
+                            <div class="border-t border-black w-36 mx-auto"></div>
+                            <p class="heading-font text-[9px] mt-1 font-bold uppercase">Sender's Seal & Sign</p>
                         </div>
                     </div>
 
-                    <p class="text-center mt-12 font-bold tracking-[0.5em] text-[13px] uppercase heading-font">Thank You For Shopping!</p>
+                    <p class="text-center mt-6 font-bold tracking-[0.4em] text-[11px] uppercase heading-font">Thank You For Shopping!</p>
                 </div>
             </div>
         </div>
@@ -204,10 +212,8 @@
         }
 
         function autoRate(input) {
-            const val = input.value;
-            const row = input.closest('.grid');
-            if (itemRates[val]) {
-                row.querySelector('.item-rate').value = itemRates[val];
+            if (itemRates[input.value]) {
+                input.closest('.grid').querySelector('.item-rate').value = itemRates[input.value];
             }
             updatePreview();
         }
@@ -231,18 +237,18 @@
                 const sub = qty * rate;
                 grandTotal += sub;
                 html += `
-                    <tr class="h-12 font-bold text-[14px]">
-                        <td class="border border-black px-4 py-2 text-center text-gray-600">${index + 1}</td>
-                        <td class="border border-black px-4 py-2">${desc || '---'}</td>
-                        <td class="border border-black px-4 py-2 text-center">${qty}</td>
-                        <td class="border border-black px-4 py-2 text-center italic">₹ ${rate}</td>
-                        <td class="border border-black px-4 py-2 text-center italic font-bold">₹ ${sub}</td>
+                    <tr class="h-10 text-[13px]">
+                        <td class="border border-black px-4 py-1 text-center font-bold">${index + 1}</td>
+                        <td class="border border-black px-4 py-1 font-bold">${desc || '---'}</td>
+                        <td class="border border-black px-4 py-1 text-center font-bold">${qty}</td>
+                        <td class="border border-black px-4 py-1 text-center font-bold">₹ ${rate}</td>
+                        <td class="border border-black px-4 py-1 text-center font-bold">₹ ${sub}</td>
                     </tr>`;
             });
 
-            // Keep A4 height consistent with blank rows
-            for(let i = itemRows.length; i < 7; i++) {
-                html += `<tr class="h-12"><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td></tr>`;
+            // Blank rows to maintain table height
+            for(let i = itemRows.length; i < 10; i++) {
+                html += `<tr class="h-10"><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td></tr>`;
             }
 
             tableBody.innerHTML = html;
