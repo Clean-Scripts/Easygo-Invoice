@@ -5,17 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EasyGo | Official Invoice</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
-        /* Base font reset to standard non-italic Playfair */
         body { font-family: 'Playfair Display', serif; -webkit-print-color-adjust: exact; }
         .heading-font { font-family: 'Cinzel', serif; }
         
-        /* A4 Constraints: Strict sizing to prevent bleeding */
         .print-container {
             width: 210mm;
             height: 297mm;
-            padding: 5mm; /* Reduced padding to fit border properly */
+            padding: 4mm;
             margin: auto;
             background: white;
             box-sizing: border-box;
@@ -24,23 +22,22 @@
         }
 
         .outer-border {
-            border: 1px solid #000;
+            border: 1.5px solid #000;
             flex-grow: 1;
-            padding: 20px;
+            padding: 25px;
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
-        /* INVOICE Title: Normal weight, centered, specific spacing */
         .invoice-title {
             font-family: 'Cinzel', serif;
-            font-size: 3.5rem;
+            font-size: 4rem;
             text-align: center;
-            margin-top: 1.5rem;
-            margin-bottom: 2rem;
-            letter-spacing: 0.15em;
-            font-style: normal !important;
+            margin-top: 1rem;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.2em;
+            font-weight: 700;
         }
 
         @media print {
@@ -66,15 +63,19 @@
                 <div class="grid grid-cols-2 gap-4">
                     <div class="col-span-2">
                         <label class="block text-[10px] uppercase text-slate-400">Invoice Number</label>
-                        <input type="text" id="inNo" value="01234" oninput="updatePreview()" class="w-full bg-slate-800 p-2 rounded border border-slate-700 outline-none">
+                        <input type="text" id="inNo" value="01234" oninput="updatePreview()" class="w-full bg-slate-800 p-2 rounded border border-slate-700 outline-none font-sans">
                     </div>
                     <div>
                         <label class="block text-[10px] uppercase text-slate-400">Date</label>
-                        <input type="text" id="inDate" value="01 January 2030" oninput="updatePreview()" class="w-full bg-slate-800 p-2 rounded border border-slate-700 outline-none">
+                        <input type="text" id="inDate" value="01 January 2030" oninput="updatePreview()" class="w-full bg-slate-800 p-2 rounded border border-slate-700 outline-none font-sans">
                     </div>
                     <div>
                         <label class="block text-[10px] uppercase text-slate-400">Customer Name</label>
-                        <input type="text" id="inTo" value="Sacha Dubois" oninput="updatePreview()" class="w-full bg-slate-800 p-2 rounded border border-slate-700 outline-none">
+                        <input type="text" id="inTo" value="Sacha Dubois" oninput="updatePreview()" class="w-full bg-slate-800 p-2 rounded border border-slate-700 outline-none font-sans">
+                    </div>
+                    <div class="col-span-2">
+                        <label class="block text-[10px] uppercase text-slate-400">Customer Address</label>
+                        <textarea id="inAddr" oninput="updatePreview()" rows="2" class="w-full bg-slate-800 p-2 rounded border border-slate-700 outline-none font-sans">123 Anywhere St., Any City, ST 12345</textarea>
                     </div>
                 </div>
 
@@ -84,7 +85,7 @@
                 
                 <button onclick="addItemRow()" class="w-full border border-blue-500 text-blue-500 py-2 rounded text-xs hover:bg-blue-500 hover:text-white transition uppercase font-bold">+ Add Row</button>
 
-                <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded mt-6 shadow-xl transition active:scale-95 uppercase tracking-widest">
+                <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded mt-6 shadow-xl uppercase tracking-widest">
                     Print Invoice
                 </button>
             </div>
@@ -96,59 +97,59 @@
                     
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-1/4">
-                            <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" alt="EasyGo Logo" class="w-28">
+                            <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" alt="EasyGo Logo" class="w-36">
                         </div>
                         
-                        <div class="w-1/2 text-center text-[10px] space-y-0.5 leading-tight">
+                        <div class="w-1/2 text-center text-[12px] space-y-1 font-bold pt-2">
                             <p>📍 : 114, Prime Square, Omaxe City 1 - Indore M.P.</p>
                             <p>📞 : +91 7651837322, +91 92389 61346</p>
                             <p>✉️ : Shibukochle@gmail.com | <b>Website:</b></p>
-                            <p class="text-blue-900 text-[12px] font-bold mt-1">GST: 23HAVPB1805E1ZZ</p>
+                            <p class="text-blue-900 text-[16px] font-bold mt-2">GST: 23HAVPB1805E1ZZ</p>
                         </div>
 
                         <div class="w-1/4 flex justify-end">
-                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/easygo.com.png?raw=true" class="w-16 h-16 border" alt="Website QR">
+                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/easygo.com.png?raw=true" class="w-20 h-20 border-2 border-black" alt="Website QR">
                         </div>
                     </div>
 
                     <h1 class="invoice-title">INVOICE</h1>
 
-                    <div class="flex justify-between mb-6 px-1">
+                    <div class="flex justify-between mb-8 px-1">
                         <div class="space-y-1">
-                            <p class="heading-font font-bold text-xs uppercase">Date Issued:</p>
-                            <p id="viewDate" class="text-gray-800 text-sm">01 January 2030</p>
-                            <p class="heading-font font-bold text-xs mt-4 uppercase">Invoice No:</p>
-                            <p id="viewNo" class="text-gray-800 text-sm">01234</p>
+                            <p class="heading-font font-bold text-lg uppercase">Date Issued:</p>
+                            <p id="viewDate" class="font-bold text-black text-lg">01 January 2030</p>
+                            <p class="heading-font font-bold text-lg mt-6 uppercase">Invoice No:</p>
+                            <p id="viewNo" class="font-bold text-black text-lg">01234</p>
                         </div>
                         <div class="text-right space-y-1">
-                            <p class="heading-font font-bold text-xs uppercase">Issued To:</p>
-                            <p id="viewTo" class="font-bold text-base">Sacha Dubois</p>
-                            <p class="text-gray-800 text-xs leading-relaxed">123 Anywhere St., Any City, ST<br>12345</p>
+                            <p class="heading-font font-bold text-lg uppercase">Issued To:</p>
+                            <p id="viewTo" class="font-bold text-2xl">Sacha Dubois</p>
+                            <p id="viewAddr" class="text-black font-bold text-lg leading-relaxed whitespace-pre-line">123 Anywhere St., Any City, ST 12345</p>
                         </div>
                     </div>
 
-                    <table class="w-full border-collapse border border-black text-left">
-                        <thead class="bg-gray-100 heading-font text-[12px] font-bold">
+                    <table class="w-full border-collapse border-[1.5px] border-black text-left mb-6">
+                        <thead class="bg-gray-100 heading-font text-[16px] font-bold">
                             <tr>
-                                <th class="border border-black px-4 py-2 w-12 text-center">NO</th>
-                                <th class="border border-black px-4 py-2">DESCRIPTION</th>
-                                <th class="border border-black px-4 py-2 w-16 text-center">QTY</th>
-                                <th class="border border-black px-4 py-2 w-20 text-center">RATE</th>
-                                <th class="border border-black px-4 py-2 w-28 text-center">SUBTOTAL</th>
+                                <th class="border-[1.5px] border-black px-4 py-3 w-16 text-center uppercase">No</th>
+                                <th class="border-[1.5px] border-black px-4 py-3 uppercase">Description</th>
+                                <th class="border-[1.5px] border-black px-4 py-3 w-24 text-center uppercase">Qty</th>
+                                <th class="border-[1.5px] border-black px-4 py-3 w-28 text-center uppercase">Rate</th>
+                                <th class="border-[1.5px] border-black px-4 py-3 w-36 text-center uppercase">Subtotal</th>
                             </tr>
                         </thead>
                         <tbody id="viewItems"></tbody>
                         <tfoot>
-                            <tr>
-                                <td colspan="4" class="border border-black px-4 py-2 text-right heading-font font-bold text-xs">GRAND TOTAL</td>
-                                <td id="viewTotal" class="border border-black px-4 py-2 text-center font-bold font-sans text-lg italic">₹ 0</td>
+                            <tr class="h-14">
+                                <td colspan="4" class="border-[1.5px] border-black px-4 py-2 text-right heading-font font-bold text-lg tracking-widest uppercase">Grand Total</td>
+                                <td id="viewTotal" class="border-[1.5px] border-black px-4 py-2 text-center font-bold font-sans text-2xl italic">₹ 0</td>
                             </tr>
                         </tfoot>
                     </table>
 
-                    <div class="mt-auto flex justify-between items-end px-1 pb-2">
-                        <div class="text-[11px] space-y-0.5 font-bold">
-                            <p class="heading-font font-bold mb-1 text-xs uppercase">Payment Details:</p>
+                    <div class="mt-auto flex justify-between items-end px-1 pb-4">
+                        <div class="text-[14px] space-y-1 font-bold leading-relaxed">
+                            <p class="heading-font font-bold mb-2 text-lg uppercase underline">Payment Details:</p>
                             <p>Bank Name: Shibu Kochle</p>
                             <p>Account No: 42708580348</p>
                             <p>Account Type: Savings</p>
@@ -156,17 +157,18 @@
                         </div>
                         
                         <div class="text-center">
-                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/QrCode.jpeg?raw=true" class="w-20 h-20 border mb-1 mx-auto" alt="Payment QR">
+                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/QrCode.jpeg?raw=true" class="w-28 h-28 border-2 border-black mb-1 mx-auto" alt="Payment QR">
+                            <p class="text-[12px] font-bold heading-font uppercase">Scan to Pay</p>
                         </div>
 
                         <div class="text-center">
-                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/invoice-sign.png?raw=true" alt="Sign" class="w-28 mx-auto -mb-1">
-                            <div class="border-t border-black w-36 mx-auto"></div>
-                            <p class="heading-font text-[9px] mt-1 font-bold uppercase">Sender's Seal & Sign</p>
+                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/invoice-sign.png?raw=true" alt="Sign" class="w-36 mx-auto -mb-2">
+                            <div class="border-t-2 border-black w-48 mx-auto"></div>
+                            <p class="heading-font text-[11px] mt-2 font-bold uppercase tracking-tighter">Sender's Seal & Sign</p>
                         </div>
                     </div>
 
-                    <p class="text-center mt-6 font-bold tracking-[0.4em] text-[11px] uppercase heading-font">Thank You For Shopping!</p>
+                    <p class="text-center mt-10 font-bold tracking-[0.5em] text-lg uppercase heading-font">Thank You For Shopping!</p>
                 </div>
             </div>
         </div>
@@ -193,7 +195,7 @@
             "French Fries [2.5 Kg]": 250
         };
 
-        function addItemRow(desc = "", qty = 1, rate = 0) {
+        function addItemRow(desc = "", qty = "1", rate = 0) {
             const container = document.getElementById('itemsContainer');
             const rowId = Date.now();
             const div = document.createElement('div');
@@ -203,7 +205,7 @@
                 <button onclick="removeRow('${rowId}')" class="absolute -right-2 -top-2 bg-red-600 rounded-full w-5 h-5 text-[10px] hidden group-hover:block transition-all shadow-lg">✕</button>
                 <div class="grid grid-cols-4 gap-2">
                     <input list="itemPresets" placeholder="Item Name" value="${desc}" onchange="autoRate(this)" oninput="updatePreview()" class="col-span-2 bg-slate-900 text-xs p-2 rounded item-desc outline-none border border-slate-600 focus:border-blue-400">
-                    <input type="number" placeholder="Qty" value="${qty}" oninput="updatePreview()" class="bg-slate-900 text-xs p-2 rounded item-qty outline-none border border-slate-600 focus:border-blue-400">
+                    <input type="text" placeholder="Qty (e.g. 1 Kg)" value="${qty}" oninput="updatePreview()" class="bg-slate-900 text-xs p-2 rounded item-qty outline-none border border-slate-600 focus:border-blue-400">
                     <input type="number" placeholder="Rate" value="${rate}" oninput="updatePreview()" class="bg-slate-900 text-xs p-2 rounded item-rate outline-none border border-slate-600 focus:border-blue-400">
                 </div>
             `;
@@ -224,6 +226,7 @@
             document.getElementById('viewNo').innerText = document.getElementById('inNo').value;
             document.getElementById('viewDate').innerText = document.getElementById('inDate').value;
             document.getElementById('viewTo').innerText = document.getElementById('inTo').value;
+            document.getElementById('viewAddr').innerText = document.getElementById('inAddr').value;
 
             const itemRows = document.querySelectorAll('#itemsContainer > div');
             const tableBody = document.getElementById('viewItems');
@@ -232,30 +235,33 @@
 
             itemRows.forEach((row, index) => {
                 const desc = row.querySelector('.item-desc').value;
-                const qty = parseFloat(row.querySelector('.item-qty').value) || 0;
+                const qty = row.querySelector('.item-qty').value;
                 const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
-                const sub = qty * rate;
+                
+                // Extract number from Qty for calculation (e.g. "2.5 Kg" -> 2.5)
+                const qtyValue = parseFloat(qty.replace(/[^\d.]/g, '')) || 0;
+                const sub = qtyValue * rate;
+                
                 grandTotal += sub;
                 html += `
-                    <tr class="h-10 text-[13px]">
-                        <td class="border border-black px-4 py-1 text-center font-bold">${index + 1}</td>
-                        <td class="border border-black px-4 py-1 font-bold">${desc || '---'}</td>
-                        <td class="border border-black px-4 py-1 text-center font-bold">${qty}</td>
-                        <td class="border border-black px-4 py-1 text-center font-bold">₹ ${rate}</td>
-                        <td class="border border-black px-4 py-1 text-center font-bold">₹ ${sub}</td>
+                    <tr class="h-14 font-bold text-[18px]">
+                        <td class="border-[1.5px] border-black px-4 py-1 text-center font-bold">${index + 1}</td>
+                        <td class="border-[1.5px] border-black px-4 py-1 font-bold">${desc || '---'}</td>
+                        <td class="border-[1.5px] border-black px-4 py-1 text-center font-bold">${qty}</td>
+                        <td class="border-[1.5px] border-black px-4 py-1 text-center font-bold">₹ ${rate}</td>
+                        <td class="border-[1.5px] border-black px-4 py-1 text-center font-bold">₹ ${sub}</td>
                     </tr>`;
             });
 
-            // Blank rows to maintain table height
-            for(let i = itemRows.length; i < 10; i++) {
-                html += `<tr class="h-10"><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td><td class="border border-black"></td></tr>`;
+            for(let i = itemRows.length; i < 8; i++) {
+                html += `<tr class="h-14"><td class="border-[1.5px] border-black"></td><td class="border-[1.5px] border-black"></td><td class="border-[1.5px] border-black"></td><td class="border-[1.5px] border-black"></td><td class="border-[1.5px] border-black"></td></tr>`;
             }
 
             tableBody.innerHTML = html;
             document.getElementById('viewTotal').innerText = `₹ ${grandTotal}`;
         }
 
-        window.onload = () => { addItemRow("Veg Momos [39 pcs]", 1, 120); updatePreview(); };
+        window.onload = () => { addItemRow("Veg Momos [39 pcs]", "1", 120); updatePreview(); };
     </script>
 </body>
 </html>
