@@ -7,9 +7,11 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <style>
+        /* --- Typography & Base --- */
         body { 
             font-family: 'Playfair Display', serif; 
             -webkit-print-color-adjust: exact; 
+            print-color-adjust: exact;
             margin: 0; 
             padding: 0; 
             background: #f1f5f9;
@@ -19,7 +21,7 @@
             font-weight: 700;
         }
         
-        /* Strict A4 sizing with NO bleeding */
+        /* --- A4 Print Standard Sizing --- */
         .print-container {
             width: 210mm;
             height: 297mm;
@@ -27,6 +29,7 @@
             background: white;
             box-sizing: border-box;
             position: relative;
+            overflow: hidden; /* STRICTLY Prevents Bleeding */
         }
 
         .outer-border {
@@ -38,68 +41,62 @@
             box-sizing: border-box;
         }
 
-        /* Inner border for table */
-        .inner-border {
-            border: 2px solid #000;
-            box-sizing: border-box;
-        }
-
-        /* Invoice Title styling */
+        /* --- Invoice Title --- */
         .invoice-title {
             font-family: 'Cinzel', serif;
             font-size: 76px; 
             text-align: center;
-            margin: 12mm 0 8mm 0;
+            margin: 8mm 0 4mm 0;
             letter-spacing: 12px;
             font-weight: 700;
-            font-style: normal;
-            text-transform: uppercase;
             line-height: 1;
+            text-transform: uppercase;
         }
 
-        /* Print styles - NO BLEEDING */
+        /* --- Table Styling --- */
+        .table-container {
+            flex-grow: 1; /* Pushes footer down */
+        }
+        .invoice-table {
+            border-collapse: collapse;
+            width: 100%;
+        }
+        .invoice-table th,
+        .invoice-table td {
+            border: 2px solid #000;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: bold;
+        }
+        /* Fixed height rows to ensure exactly 10 fit */
+        .invoice-table tr.item-row {
+            height: 48px; 
+        }
+
+        /* --- Print Specifics --- */
         @media print {
             @page { 
                 size: A4; 
                 margin: 0;
-                padding: 0;
             }
             body { 
-                background: white;
-                margin: 0;
-                padding: 0;
-                width: 210mm;
-                height: 297mm;
+                background: white; 
             }
             .no-print { 
                 display: none !important; 
             }
             .print-container { 
-                margin: 0; 
-                padding: 0;
-                width: 210mm; 
-                height: 297mm;
                 box-shadow: none;
+                margin: 0;
                 page-break-after: always;
             }
-            .outer-border {
-                border: 2px solid #000;
-                padding: 12mm 15mm;
-            }
-            
-            /* Page breaks for multiple pages */
-            .page-break {
-                page-break-before: always;
-            }
-            
-            /* Ensure no content bleeds */
-            * {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+            /* Reset height for print to avoid browser scrollbar issues */
+            .print-container {
+                height: 297mm;
             }
         }
 
-        /* Form styling */
+        /* --- Form Inputs (UI Only) --- */
         .form-input {
             background: #1e293b;
             border: 1px solid #475569;
@@ -108,219 +105,70 @@
             border-radius: 4px;
             font-size: 14px;
         }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-        }
-        
+        .form-input:focus { outline: none; border-color: #3b82f6; }
         .form-label {
-            font-size: 11px;
-            color: #94a3b8;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            font-weight: 600;
-            margin-bottom: 4px;
-            display: block;
-        }
-        
-        /* Scrollbar styling */
-        .custom-scroll::-webkit-scrollbar { 
-            width: 6px; 
-        }
-        .custom-scroll::-webkit-scrollbar-thumb { 
-            background: #4b5563; 
-            border-radius: 10px; 
-        }
-        
-        /* Table styling */
-        .invoice-table {
-            border-collapse: collapse;
-            width: 100%;
-        }
-        
-        .invoice-table th,
-        .invoice-table td {
-            border: 2px solid #000;
-            padding: 10px 15px;
-            text-align: left;
-            font-weight: bold;
-        }
-        
-        /* Make sure table fits within page */
-        .table-container {
-            max-height: 140mm;
-            overflow-y: auto;
+            font-size: 11px; color: #94a3b8; text-transform: uppercase;
+            letter-spacing: 0.05em; font-weight: 600; margin-bottom: 4px; display: block;
         }
     </style>
 </head>
 <body>
+
     <div class="flex flex-col lg:flex-row min-h-screen">
         
-        <!-- PREVIEW on LEFT (as per image) -->
-        <div class="w-full lg:w-2/3 p-4 bg-gray-400 overflow-y-auto flex justify-center items-start no-print">
-            <div class="print-container shadow-2xl">
-                <div class="outer-border">
-                    
-                    <!-- Header with logo and contact info - EXACTLY as in image -->
-                    <div class="flex items-start justify-between mb-1">
-                        <!-- Left: Logo -->
-                        <div class="w-1/4 pt-2">
-                            <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" alt="Logo" class="w-36">
-                        </div>
-                        
-                        <!-- Center: Address, phone, email, GST - EXACTLY CENTERED -->
-                        <div class="w-1/2 text-center text-[13px] font-bold leading-tight">
-                            <p class="mb-0">📍 : 114, Prime Square, Omaxe City 1 - Indore M.P.</p>
-                            <p class="mb-0">📞 : +91 7651837322, +91 92389 61346</p>
-                            <p class="mb-0">✉️ : Shibukochle@gmail.com | <span class="font-bold">Website:</span></p>
-                            <p class="text-blue-900 text-[18px] font-bold mt-0">GST: 23HAVPB1805E1ZZ</p>
-                        </div>
-
-                        <!-- Right: QR Code -->
-                        <div class="w-1/4 flex justify-end">
-                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/easygo.com.png?raw=true" class="w-24 h-24 border-2 border-black" alt="Website QR">
-                        </div>
-                    </div>
-
-                    <!-- Invoice Title -->
-                    <h1 class="invoice-title">INVOICE</h1>
-
-                    <!-- Invoice Details Section -->
-                    <div class="flex justify-between mb-8 px-2">
-                        <div class="space-y-1">
-                            <p class="heading-font font-bold text-xl uppercase">DATE ISSUED:</p>
-                            <p id="viewDate" class="font-bold text-black text-2xl">17 Dec 2026</p>
-                            <p class="heading-font font-bold text-xl mt-6 uppercase">INVOICE NO:</p>
-                            <p id="viewNo" class="font-bold text-black text-2xl font-sans">EG00001</p>
-                        </div>
-                        <div class="text-right space-y-1">
-                            <p class="heading-font font-bold text-xl uppercase">ISSUED TO:</p>
-                            <p id="viewTo" class="font-bold text-3xl">EasyGo Indore</p>
-                            <p id="viewAddr" class="text-black font-bold text-xl leading-snug whitespace-pre-line">Prime Square, Omaxe City 1, Indore (M.P.)</p>
-                        </div>
-                    </div>
-
-                    <!-- Items Table Container -->
-                    <div class="table-container mb-4">
-                        <table class="invoice-table">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="w-16 text-center heading-font text-lg">S.No.</th>
-                                    <th class="heading-font text-lg">DESCRIPTION</th>
-                                    <th class="w-28 text-center heading-font text-lg">QTY</th>
-                                    <th class="w-32 text-center heading-font text-lg">RATE</th>
-                                    <th class="w-40 text-center heading-font text-lg">SUBTOTAL</th>
-                                </tr>
-                            </thead>
-                            <tbody id="viewItems">
-                                <!-- Items will be dynamically inserted here -->
-                                <!-- Empty state shows only header -->
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Grand Total Row -->
-                    <div class="border-2 border-black mt-auto">
-                        <div class="flex">
-                            <div class="w-4/5 text-right pr-4 py-3">
-                                <span class="heading-font font-bold text-xl uppercase tracking-widest">GRAND TOTAL</span>
-                            </div>
-                            <div class="w-1/5 text-center border-l-2 border-black py-3">
-                                <span id="viewTotal" class="font-bold font-sans text-3xl italic"> -- </span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Payment Details & Footer - EXACTLY as in image -->
-                    <div class="mt-6 flex justify-between items-end">
-                        <!-- Payment Details -->
-                        <div class="text-[16px] space-y-0 font-bold leading-tight w-2/5">
-                            <p class="heading-font font-bold text-lg uppercase mb-1">PAYMENT DETAILS:</p>
-                            <p class="mb-0">Bank Name: Shibu Kochle</p>
-                            <p class="mb-0">Account No: 42708580348</p>
-                            <p class="mb-0">Account Type: Savings</p>
-                            <p class="mb-0">IFSC: SBIN0030450</p>
-                        </div>
-                        
-                        <!-- QR Code - NOT too far from Website text -->
-                        <div class="text-center w-1/5">
-                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/QrCode.jpeg?raw=true" class="w-32 h-32 border-2 border-black mx-auto" alt="Payment QR">
-                            <p class="text-[14px] font-bold heading-font uppercase mt-1">SCAN TO PAY</p>
-                        </div>
-
-                        <!-- Signature -->
-                        <div class="text-center w-2/5">
-                            <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/invoice-sign.png?raw=true" alt="Sign" class="w-44 mx-auto -mb-2">
-                            <div class="border-t-2 border-black w-64 mx-auto"></div>
-                            <p class="heading-font text-[12px] mt-2 font-bold uppercase tracking-tighter">SENDER'S SEAL & SIGN</p>
-                        </div>
-                    </div>
-
-                    <!-- Thank you message -->
-                    <p class="text-center mt-8 font-bold tracking-[0.5em] text-xl uppercase heading-font">THANK YOU FOR SHOPPING!</p>
-                    
-                    <!-- Multiple pages container -->
-                    <div id="additionalPages"></div>
+        <div class="w-full lg:w-2/3 p-4 bg-gray-400 overflow-y-auto flex flex-col items-center gap-4 no-print">
+            <div id="pagesContainer">
                 </div>
-            </div>
         </div>
 
-        <!-- FORM on RIGHT -->
-        <div class="w-full lg:w-1/3 p-6 bg-slate-900 text-white no-print overflow-y-auto custom-scroll">
-            <h2 class="heading-font text-2xl mb-6 text-blue-400 border-b border-slate-700 pb-2 font-bold uppercase">Invoice Manager</h2>
+        <div class="w-full lg:w-1/3 p-6 bg-slate-900 text-white no-print h-screen overflow-y-auto sticky top-0">
+            <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-2">
+                <h2 class="heading-font text-2xl text-blue-400 font-bold uppercase">Invoice Manager</h2>
+                <span class="text-xs text-slate-400">EasyGo v1.0</span>
+            </div>
             
             <div class="space-y-6">
-                <!-- Invoice Details -->
                 <div class="grid grid-cols-1 gap-4">
                     <div>
-                        <label class="form-label">Invoice Number</label>
+                        <label class="form-label">Invoice No</label>
                         <input type="text" id="inNo" value="EG00001" oninput="updatePreview()" class="form-input w-full">
                     </div>
-                    
                     <div>
-                        <label class="form-label">Date</label>
-                        <input type="text" id="inDate" value="17 Dec 2025" oninput="updatePreview()" class="form-input w-full">
+                        <label class="form-label">Date Issued</label>
+                        <input type="text" id="inDate" value="17 Dec 2026" oninput="updatePreview()" class="form-input w-full">
                     </div>
-                    
                     <div>
                         <label class="form-label">Customer Name</label>
-                        <input type="text" id="inTo" Placeholder="Full Name" oninput="updatePreview()" class="form-input w-full">
+                        <input type="text" id="inTo" placeholder="Sacha Dubois" value="EasyGo Indore" oninput="updatePreview()" class="form-input w-full">
                     </div>
-                    
                     <div>
                         <label class="form-label">Customer Address</label>
-                        <textarea id="inAddr" oninput="updatePreview()" rows="2" class="form-input w-full">Full Address</textarea>
+                        <textarea id="inAddr" oninput="updatePreview()" rows="2" class="form-input w-full">Prime Square, Omaxe City 1, Indore (M.P.)</textarea>
                     </div>
                 </div>
 
-                <!-- Line Items Section -->
                 <div>
-                    <h3 class="heading-font text-sm text-blue-400 font-bold uppercase mb-3">Add Items</h3>
-                    <div id="itemsContainer" class="space-y-3 mb-4">
-                        <!-- Items will be added here dynamically -->
-                    </div>
+                    <h3 class="heading-font text-sm text-blue-400 font-bold uppercase mb-3">Line Items</h3>
+                    <div id="itemsFormContainer" class="space-y-3 mb-4">
+                        </div>
                     
                     <div class="flex gap-2">
-                        <button onclick="addItemRow()" class="flex-1 border border-blue-500 text-blue-500 py-2 rounded text-xs hover:bg-blue-500 hover:text-white transition uppercase font-bold">
+                        <button onclick="addItemRow()" class="flex-1 border border-blue-500 text-blue-500 py-2 rounded text-xs hover:bg-blue-500 hover:text-white transition uppercase font-bold tracking-wider">
                             + Add Item
                         </button>
-                        <button onclick="clearAllItems()" class="flex-1 border border-red-500 text-red-500 py-2 rounded text-xs hover:bg-red-500 hover:text-white transition uppercase font-bold">
-                            Delete
+                        <button onclick="clearAllItems()" class="flex-1 border border-red-500 text-red-500 py-2 rounded text-xs hover:bg-red-500 hover:text-white transition uppercase font-bold tracking-wider">
+                            Clear All
                         </button>
                     </div>
                 </div>
                 
-                <!-- Print Button -->
-                <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded mt-6 shadow-xl uppercase tracking-widest">
+                <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded mt-6 shadow-xl uppercase tracking-[0.2em] transition transform hover:scale-[1.02]">
                     Print Invoice
                 </button>
-                
             </div>
         </div>
     </div>
 
-    <!-- DROPDOWN DATA - EXACTLY as in original -->
     <datalist id="itemPresets">
         <option value="Veg Momos [39 pcs]">
         <option value="Paneer Momos [39 pcs]">
@@ -331,8 +179,95 @@
         <option value="French Fries [2.5 Kg]">
     </datalist>
 
+    <template id="pageTemplate">
+        <div class="print-container shadow-2xl mb-4">
+            <div class="outer-border">
+                
+                <div class="flex items-start justify-between mb-1">
+                    <div class="w-1/4 pt-2">
+                        <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" alt="Logo" class="w-36">
+                    </div>
+                    <div class="w-1/2 text-center text-[13px] font-bold leading-tight">
+                        <p class="mb-0">📍 : 114, Prime Square, Omaxe City 1 - Indore M.P.</p>
+                        <p class="mb-0">📞 : +91 7651837322, +91 92389 61346</p>
+                        <p class="mb-0">✉️ : Shibukochle@gmail.com | <span class="font-bold">Website:</span></p>
+                        <p class="text-blue-900 text-[18px] font-bold mt-0">GST: 23HAVPB1805E1ZZ</p>
+                    </div>
+                    <div class="w-1/4 flex justify-end">
+                        <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/easygo.com.png?raw=true" class="w-24 h-24 border-2 border-black" alt="Website QR">
+                    </div>
+                </div>
+
+                <h1 class="invoice-title">INVOICE</h1>
+
+                <div class="flex justify-between mb-6 px-2">
+                    <div class="space-y-1">
+                        <p class="heading-font font-bold text-xl uppercase">DATE ISSUED:</p>
+                        <p class="date-display font-bold text-black text-2xl"></p>
+                        <p class="heading-font font-bold text-xl mt-4 uppercase">INVOICE NO:</p>
+                        <p class="no-display font-bold text-black text-2xl font-sans"></p>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <p class="heading-font font-bold text-xl uppercase">ISSUED TO:</p>
+                        <p class="to-display font-bold text-3xl"></p>
+                        <p class="addr-display text-black font-bold text-xl leading-snug whitespace-pre-line"></p>
+                    </div>
+                </div>
+
+                <div class="table-container mb-2">
+                    <table class="invoice-table">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="w-16 text-center heading-font text-lg">S.No.</th>
+                                <th class="heading-font text-lg">DESCRIPTION</th>
+                                <th class="w-28 text-center heading-font text-lg">QTY</th>
+                                <th class="w-32 text-center heading-font text-lg">RATE</th>
+                                <th class="w-40 text-center heading-font text-lg">SUBTOTAL</th>
+                            </tr>
+                        </thead>
+                        <tbody class="items-body">
+                            </tbody>
+                    </table>
+                </div>
+
+                <div class="border-2 border-black mt-auto">
+                    <div class="flex">
+                        <div class="w-4/5 text-right pr-4 py-3">
+                            <span class="heading-font font-bold text-xl uppercase tracking-widest">GRAND TOTAL</span>
+                        </div>
+                        <div class="w-1/5 text-center border-l-2 border-black py-3">
+                            <span class="total-display font-bold font-sans text-3xl italic"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 flex justify-between items-end">
+                    <div class="text-[16px] space-y-0 font-bold leading-tight w-2/5">
+                        <p class="heading-font font-bold text-lg uppercase mb-1">PAYMENT DETAILS:</p>
+                        <p class="mb-0">Bank Name: Shibu Kochle</p>
+                        <p class="mb-0">Account No: 42708580348</p>
+                        <p class="mb-0">Account Type: Savings</p>
+                        <p class="mb-0">IFSC: SBIN0030450</p>
+                    </div>
+                    <div class="text-center w-1/5">
+                        <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/QrCode.jpeg?raw=true" class="w-28 h-28 border-2 border-black mx-auto">
+                        <p class="text-[12px] font-bold heading-font uppercase mt-1">SCAN TO PAY</p>
+                    </div>
+                    <div class="text-center w-2/5">
+                        <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/invoice-sign.png?raw=true" class="w-40 mx-auto -mb-2">
+                        <div class="border-t-2 border-black w-60 mx-auto"></div>
+                        <p class="heading-font text-[12px] mt-2 font-bold uppercase tracking-tighter">SENDER'S SEAL & SIGN</p>
+                    </div>
+                </div>
+
+                <p class="text-center mt-6 font-bold tracking-[0.5em] text-xl uppercase heading-font">THANK YOU FOR SHOPPING!</p>
+                <div class="text-right text-[10px] font-bold mt-1 page-number"></div>
+            </div>
+        </div>
+    </template>
+
     <script>
-        // Item rates for presets
+        // --- Data & Config ---
         const itemRates = {
             "Veg Momos [39 pcs]": 120, 
             "Paneer Momos [39 pcs]": 165,
@@ -343,221 +278,148 @@
             "French Fries [2.5 Kg]": 250
         };
 
-        // Items array
         let items = [];
-        
-        // Add a new item row to the form
+        const ITEMS_PER_PAGE = 10;
+
+        // --- Form Logic ---
         function addItemRow(desc = "", qty = "", rate = "") {
-            const container = document.getElementById('itemsContainer');
+            const container = document.getElementById('itemsFormContainer');
             const rowId = Date.now();
             const div = document.createElement('div');
             div.id = `row-${rowId}`;
-            div.className = "bg-slate-800 p-3 rounded border border-slate-700 relative group";
+            div.className = "bg-slate-800 p-3 rounded border border-slate-700 relative group animate-fade-in";
             div.innerHTML = `
-                <button onclick="removeRow('${rowId}')" class="absolute -right-2 -top-2 bg-red-600 rounded-full w-5 h-5 text-[10px] hidden group-hover:block transition-all shadow-lg">✕</button>
+                <button onclick="removeRow('${rowId}')" class="absolute -right-2 -top-2 bg-red-600 rounded-full w-5 h-5 text-[10px] flex items-center justify-center text-white hidden group-hover:flex shadow-lg z-10">✕</button>
                 <div class="grid grid-cols-4 gap-2">
-                    <input list="itemPresets" placeholder="Item Name" value="${desc}" onchange="autoRate(this)" oninput="updatePreview()" class="col-span-2 bg-slate-900 text-xs p-2 rounded item-desc outline-none border border-slate-600 focus:border-blue-400">
-                    <input type="text" placeholder="Qty (e.g. 2.5 Kg)" value="${qty}" oninput="updatePreview()" class="bg-slate-900 text-xs p-2 rounded item-qty outline-none border border-slate-600 focus:border-blue-400">
+                    <input list="itemPresets" placeholder="Item Description" value="${desc}" onchange="autoRate(this)" oninput="updatePreview()" class="col-span-2 bg-slate-900 text-xs p-2 rounded item-desc outline-none border border-slate-600 focus:border-blue-400">
+                    <input type="text" placeholder="Qty" value="${qty}" oninput="updatePreview()" class="bg-slate-900 text-xs p-2 rounded item-qty outline-none border border-slate-600 focus:border-blue-400">
                     <input type="number" placeholder="Rate" value="${rate}" oninput="updatePreview()" class="bg-slate-900 text-xs p-2 rounded item-rate outline-none border border-slate-600 focus:border-blue-400">
                 </div>
             `;
             container.appendChild(div);
-            updateItemsArray();
             updatePreview();
         }
 
-        // Auto-fill rate based on item description
         function autoRate(input) {
-            if (itemRates[input.value]) {
-                input.closest('.grid').querySelector('.item-rate').value = itemRates[input.value];
+            const val = input.value;
+            if (itemRates[val]) {
+                const row = input.closest('.grid');
+                row.querySelector('.item-rate').value = itemRates[val];
+                updatePreview();
             }
-            updateItemsArray();
-            updatePreview();
         }
 
-        // Remove an item row
         function removeRow(id) { 
             document.getElementById(`row-${id}`).remove(); 
-            updateItemsArray();
             updatePreview(); 
         }
 
-        // Clear all items
         function clearAllItems() {
-            document.getElementById('itemsContainer').innerHTML = '';
-            items = [];
+            document.getElementById('itemsFormContainer').innerHTML = '';
             updatePreview();
         }
 
-        // Update the items array from form inputs
-        function updateItemsArray() {
+        // --- Core Generation Logic ---
+        function updatePreview() {
+            // 1. Collect Data
+            const no = document.getElementById('inNo').value;
+            const date = document.getElementById('inDate').value;
+            const to = document.getElementById('inTo').value;
+            const addr = document.getElementById('inAddr').value;
+
             items = [];
-            const itemRows = document.querySelectorAll('#itemsContainer > div');
-            
-            itemRows.forEach((row, index) => {
+            document.querySelectorAll('#itemsFormContainer > div').forEach(row => {
                 const desc = row.querySelector('.item-desc').value;
                 const qty = row.querySelector('.item-qty').value;
                 const rate = parseFloat(row.querySelector('.item-rate').value) || 0;
-                const qtyVal = parseFloat(qty) || 0;
-                
+                const qtyVal = parseFloat(qty) || 0; // Simple parse, allows decimals
                 if (desc || qty || rate) {
-                    items.push({
-                        id: index + 1,
-                        description: desc || '---',
-                        quantity: qty || '---',
-                        rate: rate,
-                        subtotal: qtyVal * rate
-                    });
+                    items.push({ desc, qty, rate, sub: qtyVal * rate });
                 }
             });
-        }
 
-        // Generate table HTML for items
-        function generateItemsTable(itemSubset, pageNumber = 1, isAdditionalPage = false) {
-            let html = '';
-            let grandTotal = 0;
-            
-            if (itemSubset.length === 0 && pageNumber === 1) {
-                // Show only headers when no items
-                html = `
-                    <tr class="h-12">
-                        <td class="text-center"></td>
-                        <td></td>
-                        <td class="text-center"></td>
-                        <td class="text-center font-sans"></td>
-                        <td class="text-center font-sans"></td>
-                    </tr>`;
-            } else {
-                // Add item rows
-                itemSubset.forEach((item, index) => {
-                    grandTotal += item.subtotal;
-                    const itemNumber = (pageNumber - 1) * 10 + index + 1;
-                    html += `
-                        <tr class="h-12 font-bold text-[18px]">
-                            <td class="text-center">${itemNumber}</td>
-                            <td>${item.description}</td>
-                            <td class="text-center">${item.quantity}</td>
+            // 2. Calculate Globals
+            const globalTotal = items.reduce((sum, item) => sum + item.sub, 0);
+            const totalPages = Math.max(1, Math.ceil(items.length / ITEMS_PER_PAGE));
+
+            // 3. Clear and Rebuild Pages
+            const pagesContainer = document.getElementById('pagesContainer');
+            pagesContainer.innerHTML = '';
+
+            for (let i = 0; i < totalPages; i++) {
+                const start = i * ITEMS_PER_PAGE;
+                const end = start + ITEMS_PER_PAGE;
+                const pageItems = items.slice(start, end);
+                const isLastPage = (i === totalPages - 1);
+
+                // Clone Template
+                const template = document.getElementById('pageTemplate');
+                const pageNode = template.content.cloneNode(true);
+
+                // Fill Header Info
+                pageNode.querySelector('.date-display').textContent = date;
+                pageNode.querySelector('.no-display').textContent = no;
+                pageNode.querySelector('.to-display').textContent = to;
+                pageNode.querySelector('.addr-display').textContent = addr;
+
+                // Build Table Rows (Strict 10 Rows)
+                const tbody = pageNode.querySelector('.items-body');
+                let rowsHtml = '';
+                
+                // Add actual items
+                pageItems.forEach((item, idx) => {
+                    const sn = (i * ITEMS_PER_PAGE) + idx + 1;
+                    rowsHtml += `
+                        <tr class="item-row font-bold text-[18px]">
+                            <td class="text-center">${sn}</td>
+                            <td>${item.desc}</td>
+                            <td class="text-center">${item.qty}</td>
                             <td class="text-center font-sans">₹ ${item.rate}</td>
-                            <td class="text-center font-sans">₹ ${item.subtotal}</td>
-                        </tr>`;
+                            <td class="text-center font-sans">₹ ${item.sub}</td>
+                        </tr>
+                    `;
                 });
-                
-                // Add empty rows if needed (for first page only)
-                if (pageNumber === 1 && itemSubset.length < 10) {
-                    const emptyRows = 10 - itemSubset.length;
-                    for(let i = 0; i < emptyRows; i++) {
-                        html += `
-                            <tr class="h-12">
-                                <td class="text-center">${itemSubset.length + i + 1}</td>
-                                <td></td>
-                                <td class="text-center"></td>
-                                <td class="text-center font-sans"></td>
-                                <td class="text-center font-sans"></td>
-                            </tr>`;
-                    }
+
+                // Fill Empty Rows to maintain grid
+                const emptyCount = ITEMS_PER_PAGE - pageItems.length;
+                for (let e = 0; e < emptyCount; e++) {
+                     // Calculate next S.No for empty rows? No, leave blank usually.
+                     // But if we want grid lines, we just add empty TDs
+                     rowsHtml += `
+                        <tr class="item-row">
+                            <td class="text-center"></td>
+                            <td></td>
+                            <td class="text-center"></td>
+                            <td class="text-center font-sans"></td>
+                            <td class="text-center font-sans"></td>
+                        </tr>
+                     `;
                 }
+                tbody.innerHTML = rowsHtml;
+
+                // Handle Grand Total Logic
+                const totalDisplay = pageNode.querySelector('.total-display');
+                if (isLastPage) {
+                    totalDisplay.textContent = `₹ ${globalTotal}`;
+                } else {
+                    totalDisplay.textContent = "Continued... >";
+                    totalDisplay.classList.add("text-sm", "not-italic"); // Styling for continued text
+                }
+
+                // Page Number
+                if (totalPages > 1) {
+                    pageNode.querySelector('.page-number').textContent = `Page ${i + 1} of ${totalPages}`;
+                }
+
+                pagesContainer.appendChild(pageNode);
             }
-            
-            return {html, grandTotal};
         }
 
-        // Update the preview with current values
-        function updatePreview() {
-            // Update basic fields
-            document.getElementById('viewNo').innerText = document.getElementById('inNo').value || '---';
-            document.getElementById('viewDate').innerText = document.getElementById('inDate').value || '---';
-            document.getElementById('viewTo').innerText = document.getElementById('inTo').value || '---';
-            document.getElementById('viewAddr').innerText = document.getElementById('inAddr').value || '---';
-
-            // Update items array first
-            updateItemsArray();
-            
-            // Clear additional pages
-            document.getElementById('additionalPages').innerHTML = '';
-            
-            // Calculate number of pages needed
-            const itemsPerPage = 10;
-            const totalPages = Math.max(1, Math.ceil(items.length / itemsPerPage));
-            
-            let totalGrandTotal = 0;
-            
-            // Generate content for first page
-            const firstPageItems = items.slice(0, itemsPerPage);
-            const firstPageResult = generateItemsTable(firstPageItems, 1, false);
-            totalGrandTotal += firstPageResult.grandTotal;
-            
-            document.getElementById('viewItems').innerHTML = firstPageResult.html;
-            
-            // Generate additional pages if needed
-            for (let page = 2; page <= totalPages; page++) {
-                const startIndex = (page - 1) * itemsPerPage;
-                const endIndex = startIndex + itemsPerPage;
-                const pageItems = items.slice(startIndex, endIndex);
-                const pageResult = generateItemsTable(pageItems, page, true);
-                totalGrandTotal += pageResult.grandTotal;
-                
-                // Create additional page HTML
-                const additionalPage = document.createElement('div');
-                additionalPage.className = 'print-container page-break mt-8';
-                additionalPage.innerHTML = `
-                    <div class="outer-border">
-                        <div class="flex items-start justify-between mb-1">
-                            <div class="w-1/4 pt-2">
-                                <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" alt="Logo" class="w-36">
-                            </div>
-                            <div class="w-1/2 text-center text-[13px] font-bold leading-tight">
-                                <p class="mb-0">📍 : 114, Prime Square, Omaxe City 1 - Indore M.P.</p>
-                                <p class="mb-0">📞 : +91 7651837322, +91 92389 61346</p>
-                                <p class="mb-0">✉️ : Shibukochle@gmail.com | <span class="font-bold">Website:</span></p>
-                                <p class="text-blue-900 text-[18px] font-bold mt-0">GST: 23HAVPB1805E1ZZ</p>
-                            </div>
-                            <div class="w-1/4 flex justify-end">
-                                <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/easygo.com.png?raw=true" class="w-24 h-24 border-2 border-black" alt="Website QR">
-                            </div>
-                        </div>
-                        <h1 class="invoice-title">INVOICE (CONTINUED)</h1>
-                        <div class="flex justify-between mb-8 px-2">
-                            <div class="space-y-1">
-                                <p class="heading-font font-bold text-xl uppercase">DATE ISSUED:</p>
-                                <p class="font-bold text-black text-2xl">${document.getElementById('inDate').value || '---'}</p>
-                                <p class="heading-font font-bold text-xl mt-6 uppercase">INVOICE NO:</p>
-                                <p class="font-bold text-black text-2xl font-sans">${document.getElementById('inNo').value || '---'}</p>
-                            </div>
-                            <div class="text-right space-y-1">
-                                <p class="heading-font font-bold text-xl uppercase">ISSUED TO:</p>
-                                <p class="font-bold text-3xl">${document.getElementById('inTo').value || '---'}</p>
-                            </div>
-                        </div>
-                        <div class="table-container mb-4">
-                            <table class="invoice-table">
-                                <thead class="bg-gray-100">
-                                    <tr>
-                                        <th class="w-16 text-center heading-font text-lg">S.No.</th>
-                                        <th class="heading-font text-lg">DESCRIPTION</th>
-                                        <th class="w-28 text-center heading-font text-lg">QTY</th>
-                                        <th class="w-32 text-center heading-font text-lg">RATE</th>
-                                        <th class="w-40 text-center heading-font text-lg">SUBTOTAL</th>
-                                    </tr>
-                                </thead>
-                                <tbody>${pageResult.html}</tbody>
-                            </table>
-                        </div>
-                        <div class="mt-8 text-right">
-                            <p class="text-lg font-bold">Page ${page} of ${totalPages}</p>
-                        </div>
-                    </div>
-                `;
-                
-                document.getElementById('additionalPages').appendChild(additionalPage);
-            }
-            
-            // Update grand total on first page
-            document.getElementById('viewTotal').innerText = `₹ ${totalGrandTotal}`;
-        }
-
-        // Initialize with empty items (as per image showing empty table)
-        window.onload = () => { 
-            updatePreview(); 
+        // Initialize
+        window.onload = () => {
+            // Add a default blank row if empty
+            if(items.length === 0) addItemRow(); 
+            updatePreview();
         };
     </script>
 </body>
