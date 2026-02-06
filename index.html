@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EasyGo Invoice | Final Fix</title>
+    <title>EasyGo Invoice | Bulk Excel Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
@@ -17,12 +18,13 @@
 
         /* --- LEFT PANEL: EDITOR --- */
         #form-panel {
-            width: 360px; min-width: 360px;
+            width: 380px; min-width: 380px;
             background: #0f172a; color: white;
             height: 100%; overflow-y: auto;
             border-right: 1px solid #334155;
             z-index: 50; padding: 20px;
             box-shadow: 5px 0 15px rgba(0,0,0,0.3);
+            display: flex; flex-direction: column;
         }
 
         /* --- RIGHT PANEL: PREVIEW --- */
@@ -39,6 +41,7 @@
             #form-panel { display: none !important; }
             #preview-panel { padding: 0; background: white; width: 100%; height: auto; display: block; }
             .invoice-page { margin: 0 !important; box-shadow: none !important; page-break-after: always; }
+            /* Ensure the last page doesn't produce a blank sheet if possible, though 'always' is safer for batching */
         }
 
         /* --- INVOICE GEOMETRY (A4) --- */
@@ -47,12 +50,14 @@
             background: white; position: relative;
             margin-bottom: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
             box-sizing: border-box; overflow: hidden;
+            /* Force page break after every invoice page in print stream */
+            page-break-after: always;
         }
 
         /* The Outer White Margin (Safety Zone) */
         .outer-pad {
             width: 100%; height: 100%;
-            padding: 10mm; /* 10mm white space all around */
+            padding: 10mm; 
             box-sizing: border-box;
         }
 
@@ -61,8 +66,8 @@
             width: 100%; height: 100%;
             border: 2px solid black;
             display: flex; flex-direction: column;
-            justify-content: space-between; /* Pushes Footer Down */
-            padding: 8mm 10mm 5mm 10mm; /* Top Side BottomLeft BottomRight */
+            justify-content: space-between; 
+            padding: 8mm 10mm 5mm 10mm; 
             box-sizing: border-box;
         }
 
@@ -74,8 +79,6 @@
         table { width: 100%; border-collapse: collapse; margin-top: 5px; }
         th, td { border: 2px solid black; padding: 0 8px; vertical-align: middle; }
         th { background: #f3f4f6; height: 35px; font-family: 'Cinzel', serif; font-size: 11pt; }
-        
-        /* STRICT ROW HEIGHT: 42px * 10 rows = 420px */
         tr.data-row { height: 42px; font-family: 'Playfair Display', serif; font-size: 11pt; }
         
         /* --- UTILS --- */
@@ -86,47 +89,86 @@
         }
         .input-dark:focus { outline: none; border-color: #3b82f6; }
         .lbl { font-size: 10px; text-transform: uppercase; color: #94a3b8; font-weight: bold; display: block; margin-bottom: 4px; }
+        
+        /* Tabs */
+        .tab-btn {
+            flex: 1; padding: 10px; font-weight: bold; font-size: 12px; text-transform: uppercase;
+            border-bottom: 2px solid #334155; color: #94a3b8; cursor: pointer;
+        }
+        .tab-btn.active {
+            border-bottom-color: #3b82f6; color: white;
+        }
+        .hidden-section { display: none; }
 
     </style>
 </head>
 <body>
 
     <div id="form-panel">
-        <h2 class="text-2xl font-bold text-blue-400 mb-6 font-cinzel tracking-wider border-b border-gray-700 pb-2">EasyGo Editor</h2>
-
-        <label class="lbl">Invoice Number</label>
-        <input type="text" id="inNo" value="EG00001" oninput="render()" class="input-dark">
+        <h2 class="text-2xl font-bold text-blue-400 mb-4 font-cinzel tracking-wider">EasyGo Invoice</h2>
         
-        <label class="lbl">Date Issued</label>
-        <input type="text" id="inDate" value="17 Dec 2026" oninput="render()" class="input-dark">
-        
-        <label class="lbl">Customer Name</label>
-        <input type="text" id="inTo" placeholder="Enter Client Name" oninput="render()" class="input-dark">
-        
-        <label class="lbl">Address</label>
-        <textarea id="inAddr" oninput="render()" rows="2" placeholder="Enter Client Address" class="input-dark"></textarea>
-
-        <div class="mt-6 border-t border-gray-700 pt-4">
-            <div class="flex justify-between items-end mb-2">
-                <label class="lbl text-blue-400 text-xs">Line Items</label>
-                <button onclick="resetItems()" class="text-[10px] text-red-400 hover:text-red-300 underline">Clear All</button>
-            </div>
-            
-            <div id="items-container" class="space-y-2 mb-4">
-                </div>
-            
-            <button onclick="addItem()" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 rounded text-xs font-bold transition uppercase tracking-wider mb-8">
-                + Add New Item
-            </button>
+        <div class="flex mb-6">
+            <div onclick="switchTab('single')" id="tab-single" class="tab-btn active text-center">Single Editor</div>
+            <div onclick="switchTab('bulk')" id="tab-bulk" class="tab-btn text-center">Bulk Excel</div>
         </div>
 
-        <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-xl uppercase tracking-widest text-sm fixed-bottom">
-            Print Invoice
-        </button>
+        <div id="mode-single">
+            <label class="lbl">Invoice Number</label>
+            <input type="text" id="inNo" value="EG00001" oninput="renderSingle()" class="input-dark">
+            
+            <label class="lbl">Date Issued</label>
+            <input type="text" id="inDate" value="17 Dec 2026" oninput="renderSingle()" class="input-dark">
+            
+            <label class="lbl">Customer Name</label>
+            <input type="text" id="inTo" placeholder="Enter Client Name" oninput="renderSingle()" class="input-dark">
+            
+            <label class="lbl">Address</label>
+            <textarea id="inAddr" oninput="renderSingle()" rows="2" placeholder="Enter Client Address" class="input-dark"></textarea>
+
+            <div class="mt-4 border-t border-gray-700 pt-4">
+                <div class="flex justify-between items-end mb-2">
+                    <label class="lbl text-blue-400 text-xs">Line Items</label>
+                    <button onclick="resetItems()" class="text-[10px] text-red-400 hover:text-red-300 underline">Clear All</button>
+                </div>
+                
+                <div id="items-container" class="space-y-2 mb-4">
+                    </div>
+                
+                <button onclick="addItem()" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 rounded text-xs font-bold transition uppercase tracking-wider mb-4">
+                    + Add New Item
+                </button>
+            </div>
+        </div>
+
+        <div id="mode-bulk" class="hidden-section flex-col h-full">
+            <div class="bg-slate-800 p-4 rounded border border-slate-700 mb-4">
+                <h3 class="font-bold text-white mb-2 text-sm">Step 1: Get Template</h3>
+                <p class="text-xs text-slate-400 mb-3">Download the Excel template. Do not change the header names.</p>
+                <button onclick="downloadTemplate()" class="bg-blue-600 hover:bg-blue-500 text-white text-xs py-2 px-3 rounded font-bold">
+                    ⬇ Download Template.xlsx
+                </button>
+            </div>
+
+            <div class="bg-slate-800 p-4 rounded border border-slate-700 mb-4">
+                <h3 class="font-bold text-white mb-2 text-sm">Step 2: Upload Data</h3>
+                <input type="file" id="excelInput" accept=".xlsx, .xls, .csv" onchange="handleFileUpload(this)" class="block w-full text-xs text-slate-300 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-slate-700 file:text-white hover:file:bg-slate-600"/>
+                <div id="uploadStatus" class="mt-2 text-xs text-emerald-400 font-bold hidden"></div>
+            </div>
+
+            <div class="bg-slate-900 p-3 rounded border border-slate-800 text-xs text-slate-500 italic">
+                Note: Rows with the same <strong>Invoice No</strong> will be grouped into a single invoice.
+            </div>
+        </div>
+
+        <div class="mt-auto pt-4">
+            <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-xl uppercase tracking-widest text-sm">
+                🖨️ Print Invoices
+            </button>
+        </div>
     </div>
 
     <div id="preview-panel">
-        <div id="pages-wrapper">
+        <div id="pages-wrapper" class="flex flex-col items-center">
             </div>
     </div>
 
@@ -149,126 +191,174 @@
             "French Fries [2.5 Kg]": 250
         };
 
-        // Initialize with one empty row
-        let items = [{ desc: "", qty: "", rate: "" }];
+        // --- STATE ---
+        let currentMode = 'single';
+        let singleItems = [{ desc: "", qty: "", rate: "" }];
+        let bulkInvoices = [];
 
-        // --- RENDER FORM INPUTS ---
-        function renderItemsInput() {
-            const container = document.getElementById('items-container');
-            container.innerHTML = '';
-            items.forEach((item, idx) => {
-                container.innerHTML += `
-                    <div class="group relative bg-slate-800 p-2 rounded border border-slate-700">
-                        <div class="absolute -left-2 top-2 bg-slate-900 text-[10px] text-slate-500 px-1 rounded border border-slate-700">${idx+1}</div>
-                        <div class="flex gap-2 mb-2">
-                            <input list="presets" value="${item.desc}" oninput="updateItem(${idx}, 'desc', this.value)" class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white w-full outline-none focus:border-blue-500" placeholder="Description">
-                            <button onclick="delItem(${idx})" class="text-red-500 hover:text-white px-2">×</button>
-                        </div>
-                        <div class="flex gap-2">
-                            <input value="${item.qty}" oninput="updateItem(${idx}, 'qty', this.value)" class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white w-1/2 outline-none focus:border-blue-500 text-center" placeholder="Qty">
-                            <input type="number" value="${item.rate}" oninput="updateItem(${idx}, 'rate', this.value)" class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white w-1/2 outline-none focus:border-blue-500 text-center" placeholder="Rate">
-                        </div>
-                    </div>
-                `;
-            });
-            render();
-        }
-
-        // --- UPDATE STATE ---
-        function updateItem(idx, key, val) {
-            items[idx][key] = val;
-            if(key === 'desc' && PRESETS[val]) {
-                items[idx].rate = PRESETS[val];
-                renderItemsInput(); // Re-render to show new rate
-            } else {
-                render(); // Just update preview
-            }
-        }
-
-        function addItem() { items.push({desc:"", qty:"", rate:""}); renderItemsInput(); }
-        function delItem(idx) { if(items.length > 1) items.splice(idx,1); renderItemsInput(); }
-        function resetItems() { items = [{desc:"", qty:"", rate:""}]; renderItemsInput(); }
-
-        // --- MAIN RENDER LOGIC ---
-        function render() {
-            const wrapper = document.getElementById('pages-wrapper');
-            wrapper.innerHTML = '';
+        // --- TABS LOGIC ---
+        function switchTab(mode) {
+            currentMode = mode;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`tab-${mode}`).classList.add('active');
             
-            // Get Header Data
+            document.getElementById('mode-single').style.display = mode === 'single' ? 'block' : 'none';
+            document.getElementById('mode-bulk').style.display = mode === 'bulk' ? 'flex' : 'none';
+
+            if(mode === 'single') renderSingle();
+            else renderBulk();
+        }
+
+        // --- EXCEL LOGIC ---
+        function downloadTemplate() {
+            const data = [
+                { "Invoice No": "EG001", "Date": "17 Dec 2026", "Customer Name": "John Doe", "Address": "123 Street, Indore", "Item": "Veg Momos", "Qty": 2, "Rate": 120 },
+                { "Invoice No": "EG001", "Date": "17 Dec 2026", "Customer Name": "John Doe", "Address": "123 Street, Indore", "Item": "Coke", "Qty": 1, "Rate": 40 },
+                { "Invoice No": "EG002", "Date": "18 Dec 2026", "Customer Name": "Jane Smith", "Address": "456 Avenue, Bhopal", "Item": "Paneer Momos", "Qty": 5, "Rate": 165 }
+            ];
+            const ws = XLSX.utils.json_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Template");
+            XLSX.writeFile(wb, "EasyGo_Template.xlsx");
+        }
+
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            if(!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, {type: 'array'});
+                const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                processBulkData(jsonData);
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        function processBulkData(data) {
+            const grouped = {};
+            
+            // Group flat rows by Invoice No
+            data.forEach(row => {
+                const no = row["Invoice No"] || "UNKNOWN";
+                if(!grouped[no]) {
+                    grouped[no] = {
+                        no: no,
+                        date: row["Date"] || "",
+                        to: row["Customer Name"] || "",
+                        addr: row["Address"] || "",
+                        items: []
+                    };
+                }
+                if(row["Item"]) {
+                    grouped[no].items.push({
+                        desc: row["Item"],
+                        qty: row["Qty"],
+                        rate: row["Rate"]
+                    });
+                }
+            });
+
+            bulkInvoices = Object.values(grouped);
+            
+            const status = document.getElementById('uploadStatus');
+            status.innerText = `✅ Loaded ${bulkInvoices.length} Invoices ready to print!`;
+            status.classList.remove('hidden');
+            
+            renderBulk();
+        }
+
+        // --- RENDERERS ---
+        
+        // 1. Single Mode Renderer (Reads DOM)
+        function renderSingle() {
+            if(currentMode !== 'single') return;
             const data = {
                 no: document.getElementById('inNo').value,
                 date: document.getElementById('inDate').value,
                 to: document.getElementById('inTo').value,
-                addr: document.getElementById('inAddr').value
+                addr: document.getElementById('inAddr').value,
+                items: singleItems
             };
+            document.getElementById('pages-wrapper').innerHTML = generateInvoiceHTML(data);
+        }
 
-            // Process Items (Logic: If qty/rate missing, subtotal is 0 but hidden)
-            const processedItems = items.map(i => {
+        // 2. Bulk Mode Renderer (Reads Array)
+        function renderBulk() {
+            if(currentMode !== 'bulk') return;
+            const wrapper = document.getElementById('pages-wrapper');
+            
+            if(bulkInvoices.length === 0) {
+                wrapper.innerHTML = `<div class="text-white text-center mt-20 opacity-50">Upload an Excel file to see previews here.</div>`;
+                return;
+            }
+
+            let fullHTML = '';
+            bulkInvoices.forEach(inv => {
+                fullHTML += generateInvoiceHTML(inv);
+            });
+            wrapper.innerHTML = fullHTML;
+        }
+
+        // 3. Core HTML Generator (Pure Function)
+        function generateInvoiceHTML(invoiceData) {
+            // Process Items
+            const processedItems = invoiceData.items.map(i => {
                 const q = parseFloat(i.qty) || 0;
                 const r = parseFloat(i.rate) || 0;
-                const hasData = i.desc || i.qty || i.rate; // Check if row is touched
+                const hasData = i.desc || i.qty || i.rate;
                 return { 
-                    ...i, 
-                    sub: q*r,
+                    desc: i.desc,
                     displayQty: i.qty,
                     displayRate: i.rate ? `₹ ${i.rate}` : '',
                     displaySub: (q && r) ? `₹ ${q*r}` : '',
+                    sub: q*r,
                     isEmpty: !hasData 
                 };
             });
 
-            // Calculate Total (Only valid numbers)
             const total = processedItems.reduce((a,b) => a + b.sub, 0);
-            
-            // Pagination: Split into chunks of 10
+
+            // Pagination Logic
             const chunks = [];
-            // If completely empty (initial state), still show 1 page
             if(processedItems.length === 0) chunks.push([]);
             else {
                 for(let i=0; i<processedItems.length; i+=10) chunks.push(processedItems.slice(i, i+10));
             }
 
-            // Generate Pages
+            let html = '';
+
             chunks.forEach((chunk, pageIdx) => {
                 const isLast = pageIdx === chunks.length - 1;
                 const pageNum = pageIdx + 1;
-                
                 let rows = '';
-                
-                // 1. Render Actual Items
+
                 chunk.forEach((it, i) => {
                     const sn = (pageIdx*10)+i+1;
-                    // If row is purely empty (user just cleared it), don't show S.No or garbage
                     const showSn = !it.isEmpty ? sn : '';
-                    
                     rows += `
                         <tr class="data-row">
                             <td class="text-center">${showSn}</td>
-                            <td>${it.desc}</td>
-                            <td class="text-center font-bold font-sans">${it.displayQty}</td>
-                            <td class="text-center font-bold font-sans">${it.displayRate}</td>
-                            <td class="text-center font-bold font-sans">${it.displaySub}</td>
-                        </tr>
-                    `;
+                            <td>${it.desc || ''}</td>
+                            <td class="text-center font-bold font-sans">${it.displayQty || ''}</td>
+                            <td class="text-center font-bold font-sans">${it.displayRate || ''}</td>
+                            <td class="text-center font-bold font-sans">${it.displaySub || ''}</td>
+                        </tr>`;
                 });
 
-                // 2. Fill Remaining Empty Rows (To reach 10)
-                const remaining = 10 - chunk.length;
-                for(let i=0; i < remaining; i++) {
+                // Fill empty rows
+                for(let i=0; i < (10 - chunk.length); i++) {
                     rows += `<tr class="data-row"><td></td><td></td><td></td><td></td><td></td></tr>`;
                 }
 
-                // Total Logic (Show total only if > 0 or explicit 0, otherwise hide on clean slate)
-                // Actually, standard invoice always shows 0.00 if empty. But user requested "no entries".
-                // We will show Total 0 if text fields are empty.
                 const totalText = isLast ? `₹ ${total}` : `<span class="text-sm italic font-normal text-gray-500">Continued...</span>`;
 
-                const page = document.createElement('div');
-                page.className = 'invoice-page';
-                page.innerHTML = `
+                html += `
+                <div class="invoice-page">
                     <div class="outer-pad">
                         <div class="border-box">
-                            
                             <div>
                                 <div class="flex justify-between items-start mb-2">
                                     <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" class="w-32 mt-2">
@@ -288,14 +378,14 @@
                                 <div class="flex justify-between items-end mb-2 px-1">
                                     <div>
                                         <div class="font-cinzel font-bold text-lg leading-none mb-1">DATE ISSUED:</div>
-                                        <div class="text-xl font-bold font-playfair leading-none mb-4">${data.date}</div>
+                                        <div class="text-xl font-bold font-playfair leading-none mb-4">${invoiceData.date}</div>
                                         <div class="font-cinzel font-bold text-lg leading-none mb-1">INVOICE NO:</div>
-                                        <div class="text-xl font-bold font-sans leading-none">${data.no}</div>
+                                        <div class="text-xl font-bold font-sans leading-none">${invoiceData.no}</div>
                                     </div>
                                     <div class="text-right">
                                         <div class="font-cinzel font-bold text-lg leading-none mb-1">ISSUED TO:</div>
-                                        <div class="text-2xl font-bold font-playfair leading-none mb-1">${data.to}</div>
-                                        <div class="text-lg font-bold w-64 ml-auto whitespace-pre-line leading-tight text-right">${data.addr}</div>
+                                        <div class="text-2xl font-bold font-playfair leading-none mb-1">${invoiceData.to}</div>
+                                        <div class="text-lg font-bold w-64 ml-auto whitespace-pre-line leading-tight text-right">${invoiceData.addr}</div>
                                     </div>
                                 </div>
 
@@ -346,13 +436,48 @@
                                 
                                 <div class="text-right text-[9pt] font-bold">Page ${pageNum} of ${chunks.length}</div>
                             </div>
+                        </div>
+                    </div>
+                </div>`;
+            });
+            return html;
+        }
 
+        // --- SINGLE MODE UI LOGIC ---
+        function renderItemsInput() {
+            const container = document.getElementById('items-container');
+            container.innerHTML = '';
+            singleItems.forEach((item, idx) => {
+                container.innerHTML += `
+                    <div class="group relative bg-slate-800 p-2 rounded border border-slate-700">
+                        <div class="absolute -left-2 top-2 bg-slate-900 text-[10px] text-slate-500 px-1 rounded border border-slate-700">${idx+1}</div>
+                        <div class="flex gap-2 mb-2">
+                            <input list="presets" value="${item.desc}" oninput="updateItem(${idx}, 'desc', this.value)" class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white w-full outline-none focus:border-blue-500" placeholder="Description">
+                            <button onclick="delItem(${idx})" class="text-red-500 hover:text-white px-2">×</button>
+                        </div>
+                        <div class="flex gap-2">
+                            <input value="${item.qty}" oninput="updateItem(${idx}, 'qty', this.value)" class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white w-1/2 outline-none focus:border-blue-500 text-center" placeholder="Qty">
+                            <input type="number" value="${item.rate}" oninput="updateItem(${idx}, 'rate', this.value)" class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white w-1/2 outline-none focus:border-blue-500 text-center" placeholder="Rate">
                         </div>
                     </div>
                 `;
-                wrapper.appendChild(page);
             });
+            renderSingle();
         }
+
+        function updateItem(idx, key, val) {
+            singleItems[idx][key] = val;
+            if(key === 'desc' && PRESETS[val]) {
+                singleItems[idx].rate = PRESETS[val];
+                renderItemsInput();
+            } else {
+                renderSingle();
+            }
+        }
+
+        function addItem() { singleItems.push({desc:"", qty:"", rate:""}); renderItemsInput(); }
+        function delItem(idx) { if(singleItems.length > 1) singleItems.splice(idx,1); renderItemsInput(); }
+        function resetItems() { singleItems = [{desc:"", qty:"", rate:""}]; renderItemsInput(); }
 
         // Init
         renderItemsInput();
