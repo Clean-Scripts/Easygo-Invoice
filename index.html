@@ -1,16 +1,4 @@
-I hear you. "Bleeding" usually happens because browsers add their own margins on top of the code's dimensions, pushing everything off the edge.
 
-I have completely rewritten the code to solve this. I have **removed the reliance on Tailwind CSS for the invoice itself** and replaced it with **rigid, hard-coded CSS** specifically designed for A4 paper (`210mm x 297mm`).
-
-**Why this will work:**
-
-1. **Zero Margins:** It forces the browser to strip its default white margins.
-2. **Fixed Math:** The table rows are now mathematically locked to `12mm` height. 10 rows = 120mm. The header/footer space is fixed. It *cannot* overflow.
-3. **CSS Reset:** It uses a strict "Print Reset" to ensure what you see on screen is exactly what prints.
-
-Save this as an `.html` file and open it.
-
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -423,5 +411,3 @@ Save this as an `.html` file and open it.
     </script>
 </body>
 </html>
-
-```
