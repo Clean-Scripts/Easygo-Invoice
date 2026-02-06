@@ -1,3 +1,11 @@
+This update fulfills your requests:
+
+1. **Header Replacement:** The top section (Logo, Address, Contact, QR) has been replaced with the single image you provided (`invoice-top.png`).
+2. **Auto-Shrinking Text:** I added a smart logic that counts the characters in the **Address** and **Customer Name**. If they are too long, the font size automatically reduces (from `18px` down to `10px` if necessary) so the layout never breaks or bleeds.
+
+Save this as your final HTML file.
+
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -65,7 +73,7 @@
             border: 2px solid black;
             display: flex; flex-direction: column;
             justify-content: space-between; 
-            padding: 8mm 10mm 5mm 10mm; 
+            padding: 0 10mm 5mm 10mm; /* Removed top padding to fit image flush */
             box-sizing: border-box;
         }
 
@@ -207,6 +215,7 @@
             else renderBulk();
         }
 
+        // --- EXCEL LOGIC ---
         function downloadTemplate() {
             // 15 Real-World Scenarios
             const data = [
@@ -291,7 +300,6 @@
             XLSX.writeFile(wb, "EasyGo_Full_Scenario_Template.xlsx");
         }
 
-        
         function handleFileUpload(input) {
             const file = input.files[0];
             if(!file) return;
@@ -311,36 +319,27 @@
         // Helper to fix Excel Dates (Numbers or Date Objects)
         function formatExcelDate(dateVal) {
             if (!dateVal) return "";
-            
-            // If it is a number (Excel Serial), convert it
             if (typeof dateVal === 'number') {
                 const date = new Date(Math.round((dateVal - 25569) * 86400 * 1000));
                 return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
             }
-            
-            // If it is already a JS Date object
             if (dateVal instanceof Date) {
                  return dateVal.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
             }
-
-            // If it's just text, return as is
             return dateVal;
         }
 
         function processBulkData(data) {
             const grouped = {};
-            
             data.forEach(row => {
                 const no = row["Invoice No"] || "UNKNOWN";
-                
-                // Clean the date using our helper function
                 const rawDate = row["Date"];
                 const cleanDate = formatExcelDate(rawDate);
 
                 if(!grouped[no]) {
                     grouped[no] = {
                         no: no,
-                        date: cleanDate, // Use the cleaned date
+                        date: cleanDate, 
                         to: row["Customer Name"] || "",
                         addr: row["Address"] || "",
                         items: []
@@ -354,19 +353,33 @@
                     });
                 }
             });
-
             bulkInvoices = Object.values(grouped);
-            
             const status = document.getElementById('uploadStatus');
             status.innerText = `✅ Loaded ${bulkInvoices.length} Invoices ready to print!`;
             status.classList.remove('hidden');
-            
             renderBulk();
         }
 
+        // --- DYNAMIC FONT SIZER ---
+        function getFontSizeClass(text, type) {
+            if (!text) return type === 'addr' ? "text-lg" : "text-2xl";
+            const len = text.length;
+            
+            if (type === 'addr') {
+                if (len > 100) return "text-[9pt] leading-tight";
+                if (len > 70) return "text-[11pt] leading-tight";
+                if (len > 40) return "text-[12pt] leading-snug";
+                return "text-lg leading-tight";
+            }
+            if (type === 'name') {
+                if (len > 30) return "text-lg";
+                if (len > 20) return "text-xl";
+                return "text-2xl";
+            }
+            return "text-lg";
+        }
+
         // --- RENDERERS ---
-        
-        // 1. Single Mode Renderer (Reads DOM)
         function renderSingle() {
             if(currentMode !== 'single') return;
             const data = {
@@ -379,25 +392,24 @@
             document.getElementById('pages-wrapper').innerHTML = generateInvoiceHTML(data);
         }
 
-        // 2. Bulk Mode Renderer (Reads Array)
         function renderBulk() {
             if(currentMode !== 'bulk') return;
             const wrapper = document.getElementById('pages-wrapper');
-            
             if(bulkInvoices.length === 0) {
                 wrapper.innerHTML = `<div class="text-white text-center mt-20 opacity-50">Upload an Excel file to see previews here.</div>`;
                 return;
             }
-
             let fullHTML = '';
-            bulkInvoices.forEach(inv => {
-                fullHTML += generateInvoiceHTML(inv);
-            });
+            bulkInvoices.forEach(inv => { fullHTML += generateInvoiceHTML(inv); });
             wrapper.innerHTML = fullHTML;
         }
 
         // 3. Core HTML Generator (Pure Function)
         function generateInvoiceHTML(invoiceData) {
+            // Calculate dynamic classes
+            const addrClass = getFontSizeClass(invoiceData.addr, 'addr');
+            const nameClass = getFontSizeClass(invoiceData.to, 'name');
+
             // Process Items
             const processedItems = invoiceData.items.map(i => {
                 const q = parseFloat(i.qty) || 0;
@@ -454,32 +466,22 @@
                     <div class="outer-pad">
                         <div class="border-box">
                             <div>
-                                <div class="flex justify-between items-start mb-2">
-                                    <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" class="w-32 mt-2">
-                                    <div class="text-center text-[10pt] leading-tight font-bold pt-1">
-                                        <div>📍 : 114, Prime Square, Omaxe City 1 - Indore M.P.</div>
-                                        <div>📞 : +91 7651837322, +91 92389 61346</div>
-                                        <div>✉️ : Shibukochle@gmail.com | Website:</div>
-                                        <div class="text-blue-900 text-[14pt] mt-1">GST: 23HAVPB1805E1ZZ</div>
-                                    </div>
-                                    <div class="text-right pt-1">
-                                        <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/easygo.com.png?raw=true" class="w-20 border-2 border-black inline-block">
-                                    </div>
+                                <div class="w-full mb-4">
+                                    <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/invoice-top.png?raw=true" class="w-full h-auto object-contain">
                                 </div>
-
                                 <h1 class="font-cinzel text-center text-[54px] tracking-[12px] my-2 leading-none">INVOICE</h1>
 
                                 <div class="flex justify-between items-end mb-2 px-1">
-                                    <div>
+                                    <div class="w-1/3">
                                         <div class="font-cinzel font-bold text-lg leading-none mb-1">DATE ISSUED:</div>
                                         <div class="text-xl font-bold font-playfair leading-none mb-4">${invoiceData.date}</div>
                                         <div class="font-cinzel font-bold text-lg leading-none mb-1">INVOICE NO:</div>
                                         <div class="text-xl font-bold font-sans leading-none">${invoiceData.no}</div>
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-right w-2/3">
                                         <div class="font-cinzel font-bold text-lg leading-none mb-1">ISSUED TO:</div>
-                                        <div class="text-2xl font-bold font-playfair leading-none mb-1">${invoiceData.to}</div>
-                                        <div class="text-lg font-bold w-64 ml-auto whitespace-pre-line leading-tight text-right">${invoiceData.addr}</div>
+                                        <div class="${nameClass} font-bold font-playfair leading-none mb-1">${invoiceData.to}</div>
+                                        <div class="${addrClass} font-bold w-full ml-auto whitespace-pre-line text-right">${invoiceData.addr}</div>
                                     </div>
                                 </div>
 
@@ -578,3 +580,5 @@
     </script>
 </body>
 </html>
+
+```
