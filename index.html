@@ -3,160 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EasyGo Invoice | Final Layout</title>
+    <title>EasyGo Invoice | Final Fix</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <style>
-        /* --- SCREEN LAYOUT (Form Left / Preview Right) --- */
+        /* --- LAYOUT RESET --- */
         body { 
-            margin: 0; 
-            padding: 0; 
-            height: 100vh; 
-            overflow: hidden; /* Prevent body scroll, use panel scroll */
-            display: flex;
-            background: #1e293b;
+            margin: 0; padding: 0; height: 100vh; overflow: hidden; 
+            display: flex; background: #1e293b; 
+            font-family: sans-serif;
         }
 
-        /* LEFT SIDE: FORM */
+        /* --- LEFT PANEL: EDITOR --- */
         #form-panel {
-            width: 350px; /* Fixed width for stability */
-            min-width: 350px;
-            background: #0f172a;
-            color: white;
-            height: 100%;
-            overflow-y: auto;
+            width: 360px; min-width: 360px;
+            background: #0f172a; color: white;
+            height: 100%; overflow-y: auto;
             border-right: 1px solid #334155;
-            z-index: 50;
+            z-index: 50; padding: 20px;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.3);
         }
 
-        /* RIGHT SIDE: PREVIEW */
+        /* --- RIGHT PANEL: PREVIEW --- */
         #preview-panel {
-            flex-grow: 1;
-            height: 100%;
-            overflow-y: auto; /* Scrollable preview */
-            background: #64748b;
-            padding: 40px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-grow: 1; height: 100%;
+            overflow-y: auto; background: #64748b;
+            padding: 40px; display: flex; justify-content: center; align-items: flex-start;
         }
 
-        /* --- PRINT CSS (Strict A4) --- */
+        /* --- PRINT SETTINGS --- */
         @media print {
             @page { margin: 0; size: A4; }
             body { background: white; display: block; height: auto; overflow: visible; }
             #form-panel { display: none !important; }
-            #preview-panel { 
-                display: block; 
-                padding: 0; 
-                background: white; 
-                width: 100%; 
-                height: auto; 
-                overflow: visible; 
-            }
-            .invoice-page {
-                margin: 0 !important;
-                box-shadow: none !important;
-                page-break-after: always;
-            }
+            #preview-panel { padding: 0; background: white; width: 100%; height: auto; display: block; }
+            .invoice-page { margin: 0 !important; box-shadow: none !important; page-break-after: always; }
         }
 
-        /* --- INVOICE DESIGN (Pixel Perfect) --- */
+        /* --- INVOICE GEOMETRY (A4) --- */
         .invoice-page {
-            width: 210mm;
-            height: 296mm; /* Slightly less than 297 to prevent browser rounding errors */
-            background: white;
-            position: relative;
-            margin-bottom: 20px; /* Gap between pages in preview */
-            box-shadow: 0 0 20px rgba(0,0,0,0.5);
-            box-sizing: border-box;
-            padding: 0; /* Control padding inside border-box */
-            overflow: hidden;
+            width: 210mm; height: 296mm; /* Safe A4 height */
+            background: white; position: relative;
+            margin-bottom: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            box-sizing: border-box; overflow: hidden;
         }
 
-        .outer-border {
-            width: 100%;
-            height: 100%;
-            padding: 10mm; /* The white margin around the border */
+        /* The Outer White Margin (Safety Zone) */
+        .outer-pad {
+            width: 100%; height: 100%;
+            padding: 10mm; /* 10mm white space all around */
             box-sizing: border-box;
         }
 
-        .main-border {
-            width: 100%;
-            height: 100%;
+        /* The Black Border Box */
+        .border-box {
+            width: 100%; height: 100%;
             border: 2px solid black;
-            display: flex;
-            flex-direction: column;
-            padding: 8mm 12mm; /* Internal padding */
+            display: flex; flex-direction: column;
+            justify-content: space-between; /* Pushes Footer Down */
+            padding: 8mm 10mm 5mm 10mm; /* Top Side BottomLeft BottomRight */
             box-sizing: border-box;
-            justify-content: space-between; /* Pushes Footer to bottom */
         }
 
+        /* --- TYPOGRAPHY --- */
         .font-cinzel { font-family: 'Cinzel', serif; font-weight: 700; }
         .font-playfair { font-family: 'Playfair Display', serif; font-weight: 700; }
 
-        /* TABLE STYLING */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { border: 2px solid black; padding: 4px 8px; vertical-align: middle; }
+        /* --- TABLE --- */
+        table { width: 100%; border-collapse: collapse; margin-top: 5px; }
+        th, td { border: 2px solid black; padding: 0 8px; vertical-align: middle; }
         th { background: #f3f4f6; height: 35px; font-family: 'Cinzel', serif; font-size: 11pt; }
         
-        /* Fixed row height to ensure layout stability */
+        /* STRICT ROW HEIGHT: 42px * 10 rows = 420px */
         tr.data-row { height: 42px; font-family: 'Playfair Display', serif; font-size: 11pt; }
         
-        /* Helper Classes */
-        .text-right { text-align: right; }
-        .text-center { text-align: center; }
-        .input-dark { background: #1e293b; border: 1px solid #334155; padding: 6px; width: 100%; font-size: 12px; border-radius: 4px; color: white; margin-bottom: 8px; }
+        /* --- UTILS --- */
+        .input-dark { 
+            background: #1e293b; border: 1px solid #334155; 
+            padding: 8px; width: 100%; font-size: 13px; 
+            border-radius: 4px; color: white; margin-bottom: 10px; 
+        }
         .input-dark:focus { outline: none; border-color: #3b82f6; }
-        .lbl { font-size: 10px; text-transform: uppercase; color: #94a3b8; font-weight: bold; display: block; margin-bottom: 2px; }
+        .lbl { font-size: 10px; text-transform: uppercase; color: #94a3b8; font-weight: bold; display: block; margin-bottom: 4px; }
 
     </style>
 </head>
 <body>
 
-    <div id="form-panel" class="p-6">
-        <h2 class="text-xl font-bold text-blue-400 mb-6 border-b border-slate-700 pb-2 font-cinzel">EasyGo Editor</h2>
+    <div id="form-panel">
+        <h2 class="text-2xl font-bold text-blue-400 mb-6 font-cinzel tracking-wider border-b border-gray-700 pb-2">EasyGo Editor</h2>
 
-        <div class="space-y-2 mb-6">
-            <div>
-                <label class="lbl">Invoice Number</label>
-                <input type="text" id="inNo" value="EG00001" oninput="render()" class="input-dark">
-            </div>
-            <div>
-                <label class="lbl">Date Issued</label>
-                <input type="text" id="inDate" value="17 Dec 2026" oninput="render()" class="input-dark">
-            </div>
-            <div>
-                <label class="lbl">Customer Name</label>
-                <input type="text" id="inTo" value="EasyGo Indore" oninput="render()" class="input-dark">
-            </div>
-            <div>
-                <label class="lbl">Address</label>
-                <textarea id="inAddr" oninput="render()" rows="2" class="input-dark">Prime Square, Omaxe City 1, Indore (M.P.)</textarea>
-            </div>
-        </div>
+        <label class="lbl">Invoice Number</label>
+        <input type="text" id="inNo" value="EG00001" oninput="render()" class="input-dark">
+        
+        <label class="lbl">Date Issued</label>
+        <input type="text" id="inDate" value="17 Dec 2026" oninput="render()" class="input-dark">
+        
+        <label class="lbl">Customer Name</label>
+        <input type="text" id="inTo" placeholder="Enter Client Name" oninput="render()" class="input-dark">
+        
+        <label class="lbl">Address</label>
+        <textarea id="inAddr" oninput="render()" rows="2" placeholder="Enter Client Address" class="input-dark"></textarea>
 
-        <div class="mb-6">
-            <div class="flex justify-between items-center mb-2">
-                <label class="lbl text-blue-400">Items List</label>
-                <span class="text-[10px] text-slate-500">Auto-calculates total</span>
+        <div class="mt-6 border-t border-gray-700 pt-4">
+            <div class="flex justify-between items-end mb-2">
+                <label class="lbl text-blue-400 text-xs">Line Items</label>
+                <button onclick="resetItems()" class="text-[10px] text-red-400 hover:text-red-300 underline">Clear All</button>
             </div>
             
-            <div id="items-container" class="space-y-2"></div>
+            <div id="items-container" class="space-y-2 mb-4">
+                </div>
             
-            <div class="flex gap-2 mt-3">
-                <button onclick="addItem()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded text-xs font-bold transition">+ Add</button>
-                <button onclick="resetItems()" class="flex-1 bg-red-900 hover:bg-red-800 text-white py-2 rounded text-xs font-bold transition">Reset</button>
-            </div>
-        </div>
-
-        <div class="mt-auto pt-6 border-t border-slate-700">
-            <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-3 rounded shadow-lg uppercase tracking-wider text-sm">
-                🖨️ Print Invoice
+            <button onclick="addItem()" class="w-full bg-slate-700 hover:bg-slate-600 text-white py-2 rounded text-xs font-bold transition uppercase tracking-wider mb-8">
+                + Add New Item
             </button>
-            <p class="text-[10px] text-center text-slate-500 mt-2">Use A4 Paper • No Margins</p>
         </div>
+
+        <button onclick="window.print()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-4 rounded shadow-xl uppercase tracking-widest text-sm fixed-bottom">
+            Print Invoice
+        </button>
     </div>
 
     <div id="preview-panel">
@@ -175,6 +141,7 @@
     </datalist>
 
     <script>
+        // --- CONSTANTS ---
         const PRESETS = {
             "Veg Momos [39 pcs]": 120, "Paneer Momos [39 pcs]": 165,
             "Cheese Corn Momos [36 pcs]": 150, "Mini Samosa [33 pcs]": 250,
@@ -182,32 +149,39 @@
             "French Fries [2.5 Kg]": 250
         };
 
+        // Initialize with one empty row
         let items = [{ desc: "", qty: "", rate: "" }];
 
+        // --- RENDER FORM INPUTS ---
         function renderItemsInput() {
             const container = document.getElementById('items-container');
             container.innerHTML = '';
             items.forEach((item, idx) => {
                 container.innerHTML += `
-                    <div class="flex gap-1 group relative">
-                        <div class="absolute -left-3 top-2 text-[10px] text-slate-500">${idx+1}</div>
-                        <input list="presets" value="${item.desc}" oninput="updateItem(${idx}, 'desc', this.value)" class="input-dark flex-[2]" placeholder="Item">
-                        <input value="${item.qty}" oninput="updateItem(${idx}, 'qty', this.value)" class="input-dark flex-1 text-center" placeholder="Qty">
-                        <input type="number" value="${item.rate}" oninput="updateItem(${idx}, 'rate', this.value)" class="input-dark flex-1 text-center" placeholder="₹">
-                        <button onclick="delItem(${idx})" class="text-red-500 hover:text-white px-1 text-xs">×</button>
+                    <div class="group relative bg-slate-800 p-2 rounded border border-slate-700">
+                        <div class="absolute -left-2 top-2 bg-slate-900 text-[10px] text-slate-500 px-1 rounded border border-slate-700">${idx+1}</div>
+                        <div class="flex gap-2 mb-2">
+                            <input list="presets" value="${item.desc}" oninput="updateItem(${idx}, 'desc', this.value)" class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white w-full outline-none focus:border-blue-500" placeholder="Description">
+                            <button onclick="delItem(${idx})" class="text-red-500 hover:text-white px-2">×</button>
+                        </div>
+                        <div class="flex gap-2">
+                            <input value="${item.qty}" oninput="updateItem(${idx}, 'qty', this.value)" class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white w-1/2 outline-none focus:border-blue-500 text-center" placeholder="Qty">
+                            <input type="number" value="${item.rate}" oninput="updateItem(${idx}, 'rate', this.value)" class="bg-slate-900 border border-slate-600 rounded px-2 py-1 text-xs text-white w-1/2 outline-none focus:border-blue-500 text-center" placeholder="Rate">
+                        </div>
                     </div>
                 `;
             });
             render();
         }
 
+        // --- UPDATE STATE ---
         function updateItem(idx, key, val) {
             items[idx][key] = val;
             if(key === 'desc' && PRESETS[val]) {
                 items[idx].rate = PRESETS[val];
-                renderItemsInput();
+                renderItemsInput(); // Re-render to show new rate
             } else {
-                render();
+                render(); // Just update preview
             }
         }
 
@@ -215,10 +189,12 @@
         function delItem(idx) { if(items.length > 1) items.splice(idx,1); renderItemsInput(); }
         function resetItems() { items = [{desc:"", qty:"", rate:""}]; renderItemsInput(); }
 
+        // --- MAIN RENDER LOGIC ---
         function render() {
             const wrapper = document.getElementById('pages-wrapper');
             wrapper.innerHTML = '';
             
+            // Get Header Data
             const data = {
                 no: document.getElementById('inNo').value,
                 date: document.getElementById('inDate').value,
@@ -226,78 +202,100 @@
                 addr: document.getElementById('inAddr').value
             };
 
+            // Process Items (Logic: If qty/rate missing, subtotal is 0 but hidden)
             const processedItems = items.map(i => {
                 const q = parseFloat(i.qty) || 0;
                 const r = parseFloat(i.rate) || 0;
-                return { ...i, sub: q*r };
+                const hasData = i.desc || i.qty || i.rate; // Check if row is touched
+                return { 
+                    ...i, 
+                    sub: q*r,
+                    displayQty: i.qty,
+                    displayRate: i.rate ? `₹ ${i.rate}` : '',
+                    displaySub: (q && r) ? `₹ ${q*r}` : '',
+                    isEmpty: !hasData 
+                };
             });
 
+            // Calculate Total (Only valid numbers)
             const total = processedItems.reduce((a,b) => a + b.sub, 0);
             
-            // Pagination Logic (10 items per page)
+            // Pagination: Split into chunks of 10
             const chunks = [];
+            // If completely empty (initial state), still show 1 page
             if(processedItems.length === 0) chunks.push([]);
             else {
                 for(let i=0; i<processedItems.length; i+=10) chunks.push(processedItems.slice(i, i+10));
             }
 
+            // Generate Pages
             chunks.forEach((chunk, pageIdx) => {
                 const isLast = pageIdx === chunks.length - 1;
                 const pageNum = pageIdx + 1;
                 
                 let rows = '';
+                
+                // 1. Render Actual Items
                 chunk.forEach((it, i) => {
+                    const sn = (pageIdx*10)+i+1;
+                    // If row is purely empty (user just cleared it), don't show S.No or garbage
+                    const showSn = !it.isEmpty ? sn : '';
+                    
                     rows += `
                         <tr class="data-row">
-                            <td class="text-center">${(pageIdx*10)+i+1}</td>
+                            <td class="text-center">${showSn}</td>
                             <td>${it.desc}</td>
-                            <td class="text-center font-bold font-sans">${it.qty}</td>
-                            <td class="text-center font-bold font-sans">₹ ${it.rate}</td>
-                            <td class="text-center font-bold font-sans">₹ ${it.sub}</td>
+                            <td class="text-center font-bold font-sans">${it.displayQty}</td>
+                            <td class="text-center font-bold font-sans">${it.displayRate}</td>
+                            <td class="text-center font-bold font-sans">${it.displaySub}</td>
                         </tr>
                     `;
                 });
 
-                // Fill empty rows
-                for(let i=0; i < (10 - chunk.length); i++) {
+                // 2. Fill Remaining Empty Rows (To reach 10)
+                const remaining = 10 - chunk.length;
+                for(let i=0; i < remaining; i++) {
                     rows += `<tr class="data-row"><td></td><td></td><td></td><td></td><td></td></tr>`;
                 }
 
-                const totalDisplay = isLast ? `₹ ${total}` : `<span class="text-sm italic font-normal">Continued...</span>`;
+                // Total Logic (Show total only if > 0 or explicit 0, otherwise hide on clean slate)
+                // Actually, standard invoice always shows 0.00 if empty. But user requested "no entries".
+                // We will show Total 0 if text fields are empty.
+                const totalText = isLast ? `₹ ${total}` : `<span class="text-sm italic font-normal text-gray-500">Continued...</span>`;
 
                 const page = document.createElement('div');
                 page.className = 'invoice-page';
                 page.innerHTML = `
-                    <div class="outer-border">
-                        <div class="main-border">
+                    <div class="outer-pad">
+                        <div class="border-box">
                             
                             <div>
                                 <div class="flex justify-between items-start mb-2">
-                                    <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" class="w-32">
-                                    <div class="text-center text-[10pt] leading-tight font-bold">
+                                    <img src="https://raw.githubusercontent.com/Clean-Scripts/EasyGo-Expense-Tracker/refs/heads/main/logo.png" class="w-32 mt-2">
+                                    <div class="text-center text-[10pt] leading-tight font-bold pt-1">
                                         <div>📍 : 114, Prime Square, Omaxe City 1 - Indore M.P.</div>
                                         <div>📞 : +91 7651837322, +91 92389 61346</div>
                                         <div>✉️ : Shibukochle@gmail.com | Website:</div>
                                         <div class="text-blue-900 text-[14pt] mt-1">GST: 23HAVPB1805E1ZZ</div>
                                     </div>
-                                    <div class="text-right">
+                                    <div class="text-right pt-1">
                                         <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/easygo.com.png?raw=true" class="w-20 border-2 border-black inline-block">
                                     </div>
                                 </div>
 
-                                <h1 class="font-cinzel text-center text-6xl tracking-[12px] my-2">INVOICE</h1>
+                                <h1 class="font-cinzel text-center text-[54px] tracking-[12px] my-2 leading-none">INVOICE</h1>
 
-                                <div class="flex justify-between mb-2">
+                                <div class="flex justify-between items-end mb-2 px-1">
                                     <div>
-                                        <div class="font-cinzel font-bold text-lg">DATE ISSUED:</div>
-                                        <div class="text-xl font-bold font-playfair">${data.date}</div>
-                                        <div class="font-cinzel font-bold text-lg mt-2">INVOICE NO:</div>
-                                        <div class="text-xl font-bold font-sans">${data.no}</div>
+                                        <div class="font-cinzel font-bold text-lg leading-none mb-1">DATE ISSUED:</div>
+                                        <div class="text-xl font-bold font-playfair leading-none mb-4">${data.date}</div>
+                                        <div class="font-cinzel font-bold text-lg leading-none mb-1">INVOICE NO:</div>
+                                        <div class="text-xl font-bold font-sans leading-none">${data.no}</div>
                                     </div>
                                     <div class="text-right">
-                                        <div class="font-cinzel font-bold text-lg">ISSUED TO:</div>
-                                        <div class="text-2xl font-bold font-playfair">${data.to}</div>
-                                        <div class="text-lg font-bold w-64 ml-auto whitespace-pre-line leading-tight">${data.addr}</div>
+                                        <div class="font-cinzel font-bold text-lg leading-none mb-1">ISSUED TO:</div>
+                                        <div class="text-2xl font-bold font-playfair leading-none mb-1">${data.to}</div>
+                                        <div class="text-lg font-bold w-64 ml-auto whitespace-pre-line leading-tight text-right">${data.addr}</div>
                                     </div>
                                 </div>
 
@@ -315,14 +313,14 @@
                                 </table>
 
                                 <div class="border-2 border-black border-t-0 flex">
-                                    <div class="flex-grow text-right pr-4 py-2 font-cinzel font-bold text-xl tracking-widest">GRAND TOTAL</div>
-                                    <div class="w-36 border-l-2 border-black text-center py-2 font-bold font-sans text-2xl">${totalDisplay}</div>
+                                    <div class="flex-grow text-right pr-4 py-2 font-cinzel font-bold text-xl tracking-widest flex items-center justify-end">GRAND TOTAL</div>
+                                    <div class="w-36 border-l-2 border-black text-center py-2 font-bold font-sans text-2xl italic flex items-center justify-center">${totalText}</div>
                                 </div>
                             </div>
 
-                            <div>
-                                <div class="flex items-end justify-between mt-4">
-                                    <div class="w-[45%] text-[11pt] font-bold leading-snug">
+                            <div class="pb-4">
+                                <div class="flex items-end justify-between mt-2">
+                                    <div class="w-[45%] text-[10pt] font-bold leading-snug">
                                         <div class="font-cinzel text-lg mb-1">PAYMENT DETAILS:</div>
                                         <div>Bank Name: Shibu Kochle</div>
                                         <div>Account No: 42708580348</div>
@@ -331,7 +329,7 @@
                                     </div>
                                     <div class="text-center">
                                         <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/QrCode.jpeg?raw=true" class="w-24 h-24 border-2 border-black mx-auto">
-                                        <div class="font-cinzel font-bold text-xs mt-1">SCAN TO PAY</div>
+                                        <div class="font-cinzel font-bold text-[10px] mt-1">SCAN TO PAY</div>
                                     </div>
                                     <div class="text-center w-40">
                                         <img src="https://github.com/Clean-Scripts/Easygo-Invoice/blob/main/invoice-sign.png?raw=true" class="w-32 mx-auto -mb-2">
@@ -340,9 +338,12 @@
                                     </div>
                                 </div>
 
-                                <div class="text-center mt-6 mb-4 font-cinzel font-bold text-xl tracking-[0.5em] uppercase">
+                                <div class="h-8"></div> 
+
+                                <div class="text-center font-cinzel font-bold text-xl tracking-[0.5em] uppercase mb-2">
                                     Thank You For Shopping!
                                 </div>
+                                
                                 <div class="text-right text-[9pt] font-bold">Page ${pageNum} of ${chunks.length}</div>
                             </div>
 
@@ -353,6 +354,7 @@
             });
         }
 
+        // Init
         renderItemsInput();
     </script>
 </body>
