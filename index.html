@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EasyGo Invoice | Bulk Excel Edition</title>
+    <title>EasyGo Invoice </title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
@@ -41,7 +41,6 @@
             #form-panel { display: none !important; }
             #preview-panel { padding: 0; background: white; width: 100%; height: auto; display: block; }
             .invoice-page { margin: 0 !important; box-shadow: none !important; page-break-after: always; }
-            /* Ensure the last page doesn't produce a blank sheet if possible, though 'always' is safer for batching */
         }
 
         /* --- INVOICE GEOMETRY (A4) --- */
@@ -50,7 +49,6 @@
             background: white; position: relative;
             margin-bottom: 20px; box-shadow: 0 0 20px rgba(0,0,0,0.5);
             box-sizing: border-box; overflow: hidden;
-            /* Force page break after every invoice page in print stream */
             page-break-after: always;
         }
 
@@ -209,19 +207,91 @@
             else renderBulk();
         }
 
-        // --- EXCEL LOGIC ---
         function downloadTemplate() {
+            // 15 Real-World Scenarios
             const data = [
-                { "Invoice No": "EG001", "Date": "17 Dec 2026", "Customer Name": "John Doe", "Address": "123 Street, Indore", "Item": "Veg Momos", "Qty": 2, "Rate": 120 },
-                { "Invoice No": "EG001", "Date": "17 Dec 2026", "Customer Name": "John Doe", "Address": "123 Street, Indore", "Item": "Coke", "Qty": 1, "Rate": 40 },
-                { "Invoice No": "EG002", "Date": "18 Dec 2026", "Customer Name": "Jane Smith", "Address": "456 Avenue, Bhopal", "Item": "Paneer Momos", "Qty": 5, "Rate": 165 }
+                // --- SCENARIO 1: The "Morning Coffee" (Single Item) ---
+                { "Invoice No": "EG-001", "Date": "01 Jan 2026", "Customer Name": "Nishant Jaiswal", "Address": "114 Prime Square, Indore", "Item": "Hot Coffee", "Qty": 1, "Rate": 40 },
+
+                // --- SCENARIO 2: The "Lunch Combo" (Multiple Items, Same Invoice) ---
+                { "Invoice No": "EG-002", "Date": "01 Jan 2026", "Customer Name": "Rahul Sharma", "Address": "56 Scheme No 54, Indore", "Item": "Veg Momos [39 pcs]", "Qty": 1, "Rate": 120 },
+                { "Invoice No": "EG-002", "Date": "01 Jan 2026", "Customer Name": "Rahul Sharma", "Address": "56 Scheme No 54, Indore", "Item": "Coke", "Qty": 2, "Rate": 40 },
+
+                // --- SCENARIO 3: The "Evening Return" (SAME Person, SAME Day, NEW Invoice) ---
+                { "Invoice No": "EG-003", "Date": "01 Jan 2026", "Customer Name": "Nishant Jaiswal", "Address": "114 Prime Square, Indore", "Item": "French Fries [2.5 Kg]", "Qty": 1, "Rate": 250 },
+
+                // --- SCENARIO 4: The "Next Day Visit" (Same Person, New Date) ---
+                { "Invoice No": "EG-004", "Date": "02 Jan 2026", "Customer Name": "Nishant Jaiswal", "Address": "114 Prime Square, Indore", "Item": "Cheese Balls [39 pcs]", "Qty": 1, "Rate": 630 },
+
+                // --- SCENARIO 5: The "Family Feast" (Medium Order - 5 Items) ---
+                { "Invoice No": "EG-005", "Date": "03 Jan 2026", "Customer Name": "The Gupta Family", "Address": "Royal Bungalows, Indore", "Item": "Paneer Momos [39 pcs]", "Qty": 2, "Rate": 165 },
+                { "Invoice No": "EG-005", "Date": "03 Jan 2026", "Customer Name": "The Gupta Family", "Address": "Royal Bungalows, Indore", "Item": "Veg Momos [39 pcs]", "Qty": 2, "Rate": 120 },
+                { "Invoice No": "EG-005", "Date": "03 Jan 2026", "Customer Name": "The Gupta Family", "Address": "Royal Bungalows, Indore", "Item": "Cheese Corn Nuggets", "Qty": 1, "Rate": 680 },
+                { "Invoice No": "EG-005", "Date": "03 Jan 2026", "Customer Name": "The Gupta Family", "Address": "Royal Bungalows, Indore", "Item": "Coke Large", "Qty": 4, "Rate": 80 },
+                { "Invoice No": "EG-005", "Date": "03 Jan 2026", "Customer Name": "The Gupta Family", "Address": "Royal Bungalows, Indore", "Item": "Water Bottle", "Qty": 4, "Rate": 20 },
+
+                // --- SCENARIO 6: The "Corporate Party" (Pagination Test - 2 Pages) ---
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Bulk Veg Momos", "Qty": 10, "Rate": 120 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Bulk Paneer Momos", "Qty": 10, "Rate": 165 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "French Fries Platter", "Qty": 5, "Rate": 250 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Dip: Spicy Red", "Qty": 20, "Rate": 10 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Dip: Mayo", "Qty": 20, "Rate": 10 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Dip: Mint", "Qty": 20, "Rate": 10 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Disposables (Plate)", "Qty": 50, "Rate": 5 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Tissues Pack", "Qty": 5, "Rate": 40 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Trash Bags", "Qty": 2, "Rate": 20 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Coke Crate", "Qty": 2, "Rate": 500 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Sprite Crate", "Qty": 2, "Rate": 500 },
+                { "Invoice No": "EG-006", "Date": "04 Jan 2026", "Customer Name": "Upgrad Corporate", "Address": "IT Park, Indore", "Item": "Delivery Charge", "Qty": 1, "Rate": 200 },
+
+                // --- SCENARIO 7: The "Long Address" (Testing Layout Wrap) ---
+                { "Invoice No": "EG-007", "Date": "05 Jan 2026", "Customer Name": "Sacha Dubois", "Address": "Flat 402, Building C, Kingdom Apartments, Near The Old Banyan Tree, Behind City Mall, Vijay Nagar, Indore, MP 452010", "Item": "Mini Samosa [33 pcs]", "Qty": 1, "Rate": 250 },
+
+                // --- SCENARIO 8: The "Long Item Name" (Testing Table Wrap) ---
+                { "Invoice No": "EG-008", "Date": "06 Jan 2026", "Customer Name": "Foodie Club", "Address": "Bhopal", "Item": "Special Assorted Platter (2pcs Veg, 2pcs Paneer, 2pcs Corn, 2pcs Fried) with Extra Dip", "Qty": 2, "Rate": 350 },
+
+                // --- SCENARIO 9: The "High Roller" (High Value Order) ---
+                { "Invoice No": "EG-009", "Date": "07 Jan 2026", "Customer Name": "Wedding Caterers", "Address": "Sayaji Hotel", "Item": "Cheese Corn Nuggets [33 pcs]", "Qty": 50, "Rate": 680 },
+                
+                // --- SCENARIO 10: The "Tiny Order" (Minimum Value) ---
+                { "Invoice No": "EG-010", "Date": "07 Jan 2026", "Customer Name": "Student", "Address": "Hostel 4", "Item": "Extra Dip", "Qty": 1, "Rate": 10 },
+
+                // --- SCENARIO 11: The "Walk-In" (No Address Provided) ---
+                { "Invoice No": "EG-011", "Date": "08 Jan 2026", "Customer Name": "Guest User", "Address": "N/A", "Item": "Veg Momos", "Qty": 1, "Rate": 120 },
+
+                // --- SCENARIO 12: The "Split Payment" (Person pays half cash/online - Just Itemized) ---
+                { "Invoice No": "EG-012", "Date": "09 Jan 2026", "Customer Name": "Ravi Kumar", "Address": "Indore", "Item": "Veg Momos", "Qty": 1, "Rate": 120 },
+                { "Invoice No": "EG-012", "Date": "09 Jan 2026", "Customer Name": "Ravi Kumar", "Address": "Indore", "Item": "Payment Fee", "Qty": 1, "Rate": 5 },
+
+                // --- SCENARIO 13: The "Mega Event" (Pagination Test - 3 Pages) ---
+                // Simulating 25 items for a wedding stall
+                ...Array.from({length: 25}, (_, i) => ({
+                    "Invoice No": "EG-013", 
+                    "Date": "10 Jan 2026", 
+                    "Customer Name": "Grand Wedding Stall", 
+                    "Address": "Marriott Convention Center", 
+                    "Item": `Catering Item #${i+1} - Batch A`, 
+                    "Qty": 5, 
+                    "Rate": 200
+                })),
+
+                // --- SCENARIO 14: The "Inventory Clearance" (Odd Quantities) ---
+                { "Invoice No": "EG-014", "Date": "11 Jan 2026", "Customer Name": "Staff Meal", "Address": "In-Store", "Item": "Broken/Odd Momos", "Qty": 13, "Rate": 10 },
+
+                // --- SCENARIO 15: The "Late Night Cravings" (Date change at midnight) ---
+                { "Invoice No": "EG-015", "Date": "12 Jan 2026", "Customer Name": "Night Owl", "Address": "Indore", "Item": "Maggi", "Qty": 2, "Rate": 50 }
             ];
-            const ws = XLSX.utils.json_to_sheet(data);
+            
+            // Flatten the array (because Scenario 13 uses a generator)
+            const flatData = data.flat();
+
+            const ws = XLSX.utils.json_to_sheet(flatData);
             const wb = XLSX.utils.book_new();
             XLSX.utils.book_append_sheet(wb, ws, "Template");
-            XLSX.writeFile(wb, "EasyGo_Template.xlsx");
+            XLSX.writeFile(wb, "EasyGo_Full_Scenario_Template.xlsx");
         }
 
+        
         function handleFileUpload(input) {
             const file = input.files[0];
             if(!file) return;
@@ -229,7 +299,8 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const data = new Uint8Array(e.target.result);
-                const workbook = XLSX.read(data, {type: 'array'});
+                // cellDates: true forces parsing of Excel serial dates to JS Date objects
+                const workbook = XLSX.read(data, {type: 'array', cellDates: true});
                 const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
                 const jsonData = XLSX.utils.sheet_to_json(firstSheet);
                 processBulkData(jsonData);
@@ -237,16 +308,39 @@
             reader.readAsArrayBuffer(file);
         }
 
+        // Helper to fix Excel Dates (Numbers or Date Objects)
+        function formatExcelDate(dateVal) {
+            if (!dateVal) return "";
+            
+            // If it is a number (Excel Serial), convert it
+            if (typeof dateVal === 'number') {
+                const date = new Date(Math.round((dateVal - 25569) * 86400 * 1000));
+                return date.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+            
+            // If it is already a JS Date object
+            if (dateVal instanceof Date) {
+                 return dateVal.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
+
+            // If it's just text, return as is
+            return dateVal;
+        }
+
         function processBulkData(data) {
             const grouped = {};
             
-            // Group flat rows by Invoice No
             data.forEach(row => {
                 const no = row["Invoice No"] || "UNKNOWN";
+                
+                // Clean the date using our helper function
+                const rawDate = row["Date"];
+                const cleanDate = formatExcelDate(rawDate);
+
                 if(!grouped[no]) {
                     grouped[no] = {
                         no: no,
-                        date: row["Date"] || "",
+                        date: cleanDate, // Use the cleaned date
                         to: row["Customer Name"] || "",
                         addr: row["Address"] || "",
                         items: []
